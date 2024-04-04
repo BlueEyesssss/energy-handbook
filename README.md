@@ -3,4 +3,9 @@
 > Energy Handbook helps you control your energy life
 
 `JDK: 17` - `Springboot version: 3.2.4` - `RESTfull API`
+
+Docs:
+
+- xem ở folder **Documents**
+- [Diagram (Database, Use-case)](https://drive.google.com/file/d/1WSEUqSddjgEpXbB7C4Mat8wIwLcRLXha/view?usp=sharinghttps://app.diagrams.net/#G1WSEUqSddjgEpXbB7C4Mat8wIwLcRLXha#%7B%22pageId%22%3A%22Y9-rezxYtamvbRJHf_T3%22%7D)
 #### © 2024 BlueEyesssss

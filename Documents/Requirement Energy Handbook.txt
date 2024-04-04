@@ -12,6 +12,7 @@ guest:
         + đơn vị thực phầm (vd: 1 trái, 100ml, 1 tô, ...)
         + hình ảnh
         + địa chỉ đang bán (nơi thức ăn đang ở, vd: đang bán ở Lái thiêu, Db, ... -> giúp user ước lượng đc thời gian giao hàng nếu có đặt món này)
+        + số lượng htai đang bán là bao nhiêu
     - có thể đặt hàng và thanh toán
 
     NEWS
@@ -31,7 +32,7 @@ customer (user):
     PREMIUM
     - chưa đăng ký premium:
         + xem đc danh sách các công thức nấu ăn của các user khác chia sẻ trên app (chỉ xem đc tên)
-    - đăng ký premium:
+    - đăng ký premium (10k vnd, dùng vĩnh viễn):
         + xem đc chi tiết công thức nấu ăn gồm:
             1/ tên công thức
             2/ ảnh thành phẩm
@@ -68,9 +69,9 @@ customer (user):
     - có thể chọn số lượng mua hàng (vd: mua 3 củ cà rốt, 200g đường, ...)
 
     ORDER
-    - có thể mua thực phầm bày bán trong giở hàng (cung cấp số địa chỉ, sdt, phương thức thanh toán [COD, WALLET] để shipper giao hàng)
+    - có thể mua thực phầm bày bán trong giở hàng (cung cấp địa chỉ, sdt, phương thức thanh toán [COD, WALLET, 3rdParty(vnpay, ...)] để shipper giao hàng)
         + khi cung cấp thông tin xong thì đơn hàng đang chờ admin xác nhận (PENDING)
-        + admin sẽ gọi để xác nhận đơn hàng, sau đó thàng công thì cập nhật trang thái đơn hàng là chở giao [ACCEPT]
+        + admin sẽ gọi để xác nhận đơn hàng, sau đó thàng công thì cập nhật trang thái đơn hàng là chở giao [ACCEPT], nếu ko thành công hay có chuyện gì đó thì [REJECT]
         + khi shiper bắt đầu giao hàng thi họ sẽ chuyển trạng thái đơn hàng thành [WAITING]
         + khi giao và thanh toán thành công thì sẽ đơn hàng thành [FINISH]
     - xem đc các đơn hàng (bao gồm lịch sử)
@@ -88,7 +89,7 @@ employee:
     - quản lý bách khoa thức ăn (thông tin thức ăn và số calo của chúng)
     - quản lý thức ăn bày bán
     - duyệt đơn hàng
-    - xét duyệt công thức nấu ăn bị report xem nó nên ban nó hay ko
+    - xét duyệt công thức nấu ăn bị report xem có nên ban nó hay ko
     - có thể thêm giảm giá cho sản phẩm
     - quản lý tin tức
 
