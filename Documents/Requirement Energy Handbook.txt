@@ -1,0 +1,95 @@
+4 role (guest, user, admin, shipper):
+guest:
+    FOOD
+    - xem được danh sách các loại thức ăn cũng như là số calo của nó:
+        + tên loại thực phẩm
+        + số calo trên 1 đơn vị nhất định(vd: 20calo/ 100ml, 150calo/ 1 tô, ...)
+
+    FOOD SHOP
+    - có thể xem đc danh sách các loại thực phẩm đang bày bán:
+        + tên
+        + giá trên đơn 1 đơn vị thực phẩm (vd: 10k/ 1 trái, 20k/ 100ml)
+        + đơn vị thực phầm (vd: 1 trái, 100ml, 1 tô, ...)
+        + hình ảnh
+        + địa chỉ đang bán (nơi thức ăn đang ở, vd: đang bán ở Lái thiêu, Db, ... -> giúp user ước lượng đc thời gian giao hàng nếu có đặt món này)
+
+    BMI & CALORIES NEED/ DAY
+    - dựa vào chiều cao và cân nặng:
+        + xem đc BMI của mình
+        + xem đc số calo mình cần trong 1 ngày
+user:
+    - đăng ký bằng gmail hoặc facebook
+    - đăng nhập bằng username và password
+    - lấy lại mật khẩu bằng gmail
+    - thông tin người dùng bao gồm: name, birthday, image, gender
+    - có toàn quyền của guest
+
+    PREMIUM
+    - chưa đăng ký premium:
+        + xem đc danh sách các công thức nấu ăn của các user khác chia sẻ trên app (chỉ xem đc tên)
+    - đăng ký premium:
+        + xem đc chi tiết công thức nấu ăn gồm:
+            1/ tên công thức
+            2/ ảnh thành phẩm
+            3/ thời gia ước lượng làm món đấy
+            4/ mức độ của công thức (dễ, vừa, khó)
+            4/ ngày cập nhật
+            4/ khẩu phần ăn của công thức này là cho bao nhiêu người
+            4/ mô tả về món ăn đấy
+            5/ các thành phần và số lượng cần từng thành phần, kèm theo 1 bức ảnh của từng thành phần
+            6/ các bước hướng dẫn làm món ăn (optional: có thể thêm 1 ảnh của từng bc, vd: b1/ cắt hành + image của đống hành đã cắt)
+
+    COOKING RECIPE
+    - có thể tạo công thức nấu ăn của riêng mình:
+        + private: chỉ cho 1 mình mình xem
+        + public: cho toàn bộ mọi người cùng xem
+    - có thể share công thức naấu ăn của mình cho nhiều người khác thông qua xác định username của họ
+    - có thể yêu thích công thức nấu ăn nào đó người dùng thấy thích để tiện cho việc xem lại
+    - có thể đánh giá sao (vote star) công thức nấu ăn đấy
+    - có thể báo cáo công thức đấy nếu có đăng sai nội dung (đăng bậy bạ, ko hợp pháp) cho admin xét duyệt
+    - có thể viết bình luận vào công thức nấu ăn đó
+    - có thể trả lời bình luận nào đó
+
+    NOTIFICATION
+    - xem đc các thông báo của mình (thông báo có người bình luận, thông báo giảm giá, thông báo chúc mừng sinh nhật, ...)
+        + dùng HATEOAS để gửi những link kèm (vd: thông báo giảm giá thì gửi thêm link đến shop food để mua đồ, ...)
+    - thông báo nào chưa đọc thì sẽ có màu nổi hơn thông báo đã đọc
+
+    WALLET
+    - có thể nập tiền vào WALLET của mình
+    - xem đc lịch sự biến động số dư
+
+    FOOD CARD
+    - có thêm các thực phầm được bày bán vào giở hàng
+    - có thể chọn số lượng mua hàng (vd: mua 3 củ cà rốt, 200g đường, ...)
+
+    ORDER
+    - có thể mua thực phầm bày bán trong giở hàng (cung cấp số địa chỉ, sdt, phương thức thanh toán [COD, WALLET] để shipper giao hàng)
+        + khi cung cấp thông tin xong thì đơn hàng đang chờ admin xác nhận (PENDING)
+        + admin sẽ gọi để xác nhận đơn hàng, sau đó thàng công thì cập nhật trang thái đơn hàng là chở giao [ACCEPT]
+        + khi shiper bắt đầu giao hàng thi họ sẽ chuyển trạng thái đơn hàng thành [WAITING]
+        + khi giao và thanh toán thành công thì sẽ đơn hàng thành [FINISH]
+    - xem đc các đơn hàng (bao gồm lịch sử)
+    - xem đc chi tiết đơn hàng đó:
+        - thời gian đặt hàng
+        - ca1c món hàng (tên, ảnh, số lượng mua, giá tiền tổng của số lượng, giá tiền từng đơn vị)
+        - tổng giá tiền
+        - địa chỉ nhận
+        - số điện thoại liên lạc
+        - trạng thái đơn hàng
+        - mã đơn hàng
+        - tên shipper giao hàng
+
+admin:
+    - quản lý bách khoa thức ăn (thông tin thức ăn và số calo của chúng)
+    - quản lý thức ăn bày bán
+    - duyệt đơn hàng
+    - xét duyệt công thức nấu ăn bị report xem nó nên ban nó hay ko
+    - quản lý người dùng, shipper
+
+shipper:
+    - dc admin cung cấp account
+    - xem đc các đơn hàng đang có trên hệ thống
+    - nhận đơn hàng nào đó để giao (vì có cung cấp địa chỉ giao hàng ấy, shipper xem đơn này chạy đc ko để nhận)
+    - cập nhật đơn hàng khi giao thành công
+    - xem đc lịch sử đơn hàng đã giao (thêm phần thời gian giao thành công)
