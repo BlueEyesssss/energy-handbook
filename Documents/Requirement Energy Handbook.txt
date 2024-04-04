@@ -1,4 +1,4 @@
-4 role (guest, user, admin, shipper):
+4 role (guest, customer,employee, admin, shipper):
 guest:
     FOOD
     - xem được danh sách các loại thức ăn cũng như là số calo của nó:
@@ -12,12 +12,16 @@ guest:
         + đơn vị thực phầm (vd: 1 trái, 100ml, 1 tô, ...)
         + hình ảnh
         + địa chỉ đang bán (nơi thức ăn đang ở, vd: đang bán ở Lái thiêu, Db, ... -> giúp user ước lượng đc thời gian giao hàng nếu có đặt món này)
+    - có thể đặt hàng và thanh toán
+
+    NEWS
+    - xem đc tin tức của ENERGY HANDBOOK
 
     BMI & CALORIES NEED/ DAY
     - dựa vào chiều cao và cân nặng:
         + xem đc BMI của mình
         + xem đc số calo mình cần trong 1 ngày
-user:
+customer (user):
     - đăng ký bằng gmail hoặc facebook
     - đăng nhập bằng username và password
     - lấy lại mật khẩu bằng gmail
@@ -80,12 +84,17 @@ user:
         - mã đơn hàng
         - tên shipper giao hàng
 
-admin:
+employee:
     - quản lý bách khoa thức ăn (thông tin thức ăn và số calo của chúng)
     - quản lý thức ăn bày bán
     - duyệt đơn hàng
     - xét duyệt công thức nấu ăn bị report xem nó nên ban nó hay ko
-    - quản lý người dùng, shipper
+    - có thể thêm giảm giá cho sản phẩm
+    - quản lý tin tức
+
+admin:
+    - xem thống kế doanh thu tháng, năm của cửa haàng
+    - quản lý người dùng, shipper, employee
 
 shipper:
     - dc admin cung cấp account
