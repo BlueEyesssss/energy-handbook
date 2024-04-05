@@ -7,8 +7,10 @@ import com.khaphp.energyhandbook.Repository.UserSystemRepository;
 import com.khaphp.energyhandbook.Service.UserSystemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/v1/customer")
@@ -30,9 +32,29 @@ public class UserSystemController {
         return ResponseEntity.ok(userSystemService.create(object, Role.CUSTOMER.toString()));
     }
 
+    @PostMapping("/employee")
+    public ResponseEntity<?> createObject2(@RequestBody @Valid UserSystemDTOcreate object){
+        return ResponseEntity.ok(userSystemService.create(object, Role.EMPLOYEE.toString()));
+    }
+
+    @PostMapping("/shipper")
+    public ResponseEntity<?> createObject3(@RequestBody @Valid UserSystemDTOcreate object){
+        return ResponseEntity.ok(userSystemService.create(object, Role.SHIPPER.toString()));
+    }
+
     @PutMapping
     public ResponseEntity<?> updateObject(@RequestBody UserSystemDTOcreate object){
         return ResponseEntity.ok(userSystemService.getAll());
+    }
+
+    @PutMapping(
+            path = "/img",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,     //này là dể nó cho phép swagger upload file
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> updateImage(@RequestParam("id") String id,
+                                         @RequestParam("file") MultipartFile file){
+        return ResponseEntity.ok(userSystemService.updateImage(id, file));
     }
 
     @DeleteMapping

@@ -1,5 +1,6 @@
 package com.khaphp.energyhandbook;
 
+import com.khaphp.energyhandbook.Constant.Gender;
 import com.khaphp.energyhandbook.Constant.Role;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Dto.usersystem.UserSystemDTOcreate;
@@ -11,6 +12,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
+import java.util.UUID;
 
 @SpringBootApplication
 public class EnergyHandbookApplication {
@@ -29,12 +32,16 @@ public class EnergyHandbookApplication {
 			String emailDefaultCustomer = "customer@energy.handbook.com";
 			String emailDefaultEmployee = "employee@energy.handbook.com";
 			String emailDefaultShipper = "shipper@energy.handbook.com";
+			String emailDefaultAdmin = "admin@energy.handbook.com";
 
 			UserSystem userSystem = userRepository.findByEmail(emailDefaultCustomer);
 			if(userSystem == null){
 				userService.create(UserSystemDTOcreate.builder()
 						.name("Default Customer")
 						.email(emailDefaultCustomer)
+						.gender(Gender.MALE.toString())
+						.password(UUID.randomUUID().toString())
+						.username("customer")
 						.build(), Role.CUSTOMER.toString());
 			}
 
@@ -44,6 +51,9 @@ public class EnergyHandbookApplication {
 				userService.create(UserSystemDTOcreate.builder()
 						.name("Default Employee")
 						.email(emailDefaultEmployee)
+						.gender(Gender.MALE.toString())
+						.password(UUID.randomUUID().toString())
+						.username("employee")
 						.build(), Role.EMPLOYEE.toString());
 			}
 
@@ -53,7 +63,22 @@ public class EnergyHandbookApplication {
 				userService.create(UserSystemDTOcreate.builder()
 						.name("Default Shipper")
 						.email(emailDefaultShipper)
+						.gender(Gender.MALE.toString())
+						.password(UUID.randomUUID().toString())
+						.username("shipper")
 						.build(), Role.SHIPPER.toString());
+			}
+
+			userSystem = null;
+			userSystem = userRepository.findByEmail(emailDefaultAdmin);
+			if(userSystem == null){
+				userService.create(UserSystemDTOcreate.builder()
+						.name("Admintrator")
+						.email(emailDefaultAdmin)
+						.gender(Gender.MALE.toString())
+						.password("11111")
+						.username("admin")
+						.build(), Role.ADMIN.toString());
 			}
 		};
 	}

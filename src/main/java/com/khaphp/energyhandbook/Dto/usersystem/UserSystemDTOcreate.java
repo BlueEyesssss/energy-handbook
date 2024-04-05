@@ -27,7 +27,6 @@ public class UserSystemDTOcreate {
     private String email;
     @ValidBirthday
     private long birthdayL;
-    private String imgUrl;
     @ValidGender
     private String gender;
 //    private String status;
