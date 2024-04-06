@@ -2,10 +2,12 @@ package com.khaphp.energyhandbook.Service.Impl;
 
 import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Service.MailSender;
+import com.khaphp.energyhandbook.Service.RedisService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -16,11 +18,14 @@ import java.util.Random;
 @Service
 @Slf4j
 public class MailSenderImpl implements MailSender {
-    @Value("${logo.energy_handbook.url")
-    private String urlLogo;
+    @Autowired
+    private Environment env;
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public ResponseObject<?> sendOTP(String toEmail) {
@@ -42,10 +47,10 @@ public class MailSenderImpl implements MailSender {
                     "<br><br>Thank you for using Energy Handbook." +
                     "<br>Best regards," +
                     "<br><b>Energy Handbook</b>" +
-                    "<br><img src='" + urlLogo + "'/>", html);
+                    "<br><img src='" + env.getProperty("logo.energy_handbook.url") + "'/>", html);
             mailSender.send(message);
 
-//            redisService.saveOTPToCacheRedis(toEmail, otp);
+            redisService.saveOTPToCacheRedis(toEmail, otp);
             log.info("Send otp of " + toEmail + " : " + otp);
 
             return ResponseObject.builder()

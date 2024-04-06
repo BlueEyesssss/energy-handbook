@@ -56,9 +56,14 @@ public class UserSystemController {
         return ResponseEntity.ok(userSystemService.update(object));
     }
 
-    @PutMapping("/pwd")
+    @PutMapping("/change-pwd")
     public ResponseEntity<?> changePwd(@RequestBody @Valid ChangePwdParam object){
         return ResponseEntity.ok(userSystemService.changePassword(object));
+    }
+
+    @PutMapping("/new-pwd")
+    public ResponseEntity<?> newPwd(@RequestBody @Valid NewPwdParam object){
+        return ResponseEntity.ok(userSystemService.updatePassword(object));
     }
 
     @PutMapping("/status")

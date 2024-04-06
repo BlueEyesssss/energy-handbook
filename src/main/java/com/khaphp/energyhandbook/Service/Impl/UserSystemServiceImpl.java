@@ -308,4 +308,25 @@ public class UserSystemServiceImpl implements UserSystemService {
                     .build();
         }
     }
+
+    @Override
+    public ResponseObject<Object> updatePassword(NewPwdParam param) {
+        try{
+            UserSystem userSystem = userRepository.findById(param.getId()).orElse(null);
+            if(userSystem == null) {
+                throw new Exception("user not found");
+            }
+            userSystem.setPassword(param.getNewPassword());
+            userRepository.save(userSystem);
+            return ResponseObject.builder()
+                    .code(200)
+                    .message("Success")
+                    .build();
+        }catch (Exception e){
+            return ResponseObject.builder()
+                    .code(400)
+                    .message("Exception: " + e.getMessage())
+                    .build();
+        }
+    }
 }

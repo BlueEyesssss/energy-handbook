@@ -16,4 +16,5 @@ public interface UserSystemService {
     ResponseObject<Object> changePassword(ChangePwdParam param);
     ResponseObject<Object> updateStatus(UpdateStatusParam param);
     ResponseObject<Object> updateEmail(UpdateEmailParam param);
+    ResponseObject<Object> updatePassword(NewPwdParam object);
 }
