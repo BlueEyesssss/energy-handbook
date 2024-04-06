@@ -30,7 +30,9 @@ public class SecurityConfig {
     private final String[] PUBLISH_ENDPOINTS = {
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/auth/**"
+            "/auth/**",
+            "/help/**",
+            "/**"
     };
 
     @Autowired

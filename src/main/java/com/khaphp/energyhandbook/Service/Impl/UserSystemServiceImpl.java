@@ -3,8 +3,7 @@ package com.khaphp.energyhandbook.Service.Impl;
 import com.khaphp.energyhandbook.Constant.Role;
 import com.khaphp.energyhandbook.Constant.Status;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
-import com.khaphp.energyhandbook.Dto.usersystem.LoginParam;
-import com.khaphp.energyhandbook.Dto.usersystem.UserSystemDTOcreate;
+import com.khaphp.energyhandbook.Dto.usersystem.*;
 import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Repository.UserSystemRepository;
 import com.khaphp.energyhandbook.Service.FileStore;
@@ -115,8 +114,27 @@ public class UserSystemServiceImpl implements UserSystemService {
     }
 
     @Override
-    public ResponseObject<Object> update(Object object) {
-        return null;
+    public ResponseObject<Object> update(UserSystemDTOUpdate object) {
+        try{
+            UserSystem userSystem = userRepository.findById(object.getId()).orElse(null);
+            if(userSystem == null) {
+                throw new Exception("user not found");
+            }
+            userSystem.setName(object.getName());
+            userSystem.setBirthday(new Date(object.getBirthdayL() * 1000));
+            userSystem.setGender(object.getGender());
+            userRepository.save(userSystem);
+            return ResponseObject.builder()
+                    .code(200)
+                    .message("Success")
+                    .data(userSystem)
+                    .build();
+        }catch (Exception e){
+            return ResponseObject.builder()
+                    .code(400)
+                    .message("Exception: " + e.getMessage())
+                    .build();
+        }
     }
 
     @Override
@@ -216,6 +234,51 @@ public class UserSystemServiceImpl implements UserSystemService {
                     .code(200)
                     .message("Success")
                     .data(jwtHelper.generateToken(userSystem.getUsername(), Map.of("role", userSystem.getRole())))
+                    .build();
+        }catch (Exception e){
+            return ResponseObject.builder()
+                    .code(400)
+                    .message("Exception: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @Override
+    public ResponseObject<Object> changePassword(ChangePwdParam param) {
+        try{
+            UserSystem userSystem = userRepository.findById(param.getId()).orElse(null);
+            if(userSystem == null) {
+                throw new Exception("user not found");
+            }
+            if(!userSystem.getPassword().equals(param.getPassword())) {
+                throw new Exception("Wrong old password");
+            }
+            userSystem.setPassword(param.getNewPassword());
+            userRepository.save(userSystem);
+            return ResponseObject.builder()
+                    .code(200)
+                    .message("Success")
+                    .build();
+        }catch (Exception e){
+            return ResponseObject.builder()
+                    .code(400)
+                    .message("Exception: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @Override
+    public ResponseObject<Object> updateStatus(UpdateStatusParam param) {
+        try{
+            UserSystem userSystem = userRepository.findById(param.getId()).orElse(null);
+            if(userSystem == null) {
+                throw new Exception("user not found");
+            }
+            userSystem.setStatus(param.getStatus());
+            userRepository.save(userSystem);
+            return ResponseObject.builder()
+                    .code(200)
+                    .message("Success")
                     .build();
         }catch (Exception e){
             return ResponseObject.builder()

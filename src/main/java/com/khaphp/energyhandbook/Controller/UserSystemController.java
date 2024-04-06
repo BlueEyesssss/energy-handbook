@@ -1,6 +1,9 @@
 package com.khaphp.energyhandbook.Controller;
 
 import com.khaphp.energyhandbook.Constant.Role;
+import com.khaphp.energyhandbook.Dto.usersystem.ChangePwdParam;
+import com.khaphp.energyhandbook.Dto.usersystem.UpdateStatusParam;
+import com.khaphp.energyhandbook.Dto.usersystem.UserSystemDTOUpdate;
 import com.khaphp.energyhandbook.Dto.usersystem.UserSystemDTOcreate;
 import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Repository.UserSystemRepository;
@@ -18,16 +21,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/v1/customer")
-@SecurityRequirement(name = "EnergyHandbook")
+//@SecurityRequirement(name = "EnergyHandbook")
 public class UserSystemController {
     @Autowired
     private UserSystemService userSystemService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole(" +
-            "'ROLE_"+Role.ADMIN+"'," +
-            "'ROLE_"+Role.EMPLOYEE+"'" +
-            ")")
+//    @PreAuthorize("hasAnyRole(" +
+//            "'ROLE_"+Role.ADMIN+"'," +
+//            "'ROLE_"+Role.EMPLOYEE+"'" +
+//            ")")
     public ResponseEntity<?> getAll(){
         return ResponseEntity.ok(userSystemService.getAll());
     }
@@ -52,8 +55,18 @@ public class UserSystemController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateObject(@RequestBody UserSystemDTOcreate object){
-        return ResponseEntity.ok(userSystemService.getAll());
+    public ResponseEntity<?> updateObject(@RequestBody @Valid UserSystemDTOUpdate object){
+        return ResponseEntity.ok(userSystemService.update(object));
+    }
+
+    @PutMapping("/pwd")
+    public ResponseEntity<?> changePwd(@RequestBody @Valid ChangePwdParam object){
+        return ResponseEntity.ok(userSystemService.changePassword(object));
+    }
+
+    @PutMapping("/status")
+    public ResponseEntity<?> updateStatus(@RequestBody @Valid UpdateStatusParam object){
+        return ResponseEntity.ok(userSystemService.updateStatus(object));
     }
 
     @PutMapping(
