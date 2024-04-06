@@ -3,14 +3,20 @@ package com.khaphp.energyhandbook.Service.Impl;
 import com.khaphp.energyhandbook.Constant.Role;
 import com.khaphp.energyhandbook.Constant.Status;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
+import com.khaphp.energyhandbook.Dto.usersystem.LoginParam;
 import com.khaphp.energyhandbook.Dto.usersystem.UserSystemDTOcreate;
 import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Repository.UserSystemRepository;
 import com.khaphp.energyhandbook.Service.FileStore;
 import com.khaphp.energyhandbook.Service.UserSystemService;
+import com.khaphp.energyhandbook.Util.Security.JwtHelper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +40,19 @@ public class UserSystemServiceImpl implements UserSystemService {
 
     @Autowired
     private UserSystemRepository userRepository;
+
+    @Autowired
+    private JwtHelper jwtHelper;
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+                return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            }
+        };
+    }
 
     @Override
     public ResponseObject<Object> getAll() {
@@ -174,6 +193,29 @@ public class UserSystemServiceImpl implements UserSystemService {
                     .code(200)
                     .message("Success")
                     .data(null)
+                    .build();
+        }catch (Exception e){
+            return ResponseObject.builder()
+                    .code(400)
+                    .message("Exception: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @Override
+    public ResponseObject<Object> login(LoginParam param) {
+        try{
+            UserSystem userSystem = userRepository.findByUsername(param.getUsername()).orElse(null);
+            if(userSystem == null) {
+                throw new Exception("user not found");
+            }
+            if(userSystem.getStatus().equals(Status.DEACTIVE.toString())) {
+                throw new Exception("Your account was Ban");
+            }
+            return ResponseObject.builder()
+                    .code(200)
+                    .message("Success")
+                    .data(jwtHelper.generateToken(userSystem.getUsername(), Map.of("role", userSystem.getRole())))
                     .build();
         }catch (Exception e){
             return ResponseObject.builder()
