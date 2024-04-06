@@ -1,10 +1,7 @@
 package com.khaphp.energyhandbook.Controller;
 
 import com.khaphp.energyhandbook.Constant.Role;
-import com.khaphp.energyhandbook.Dto.usersystem.ChangePwdParam;
-import com.khaphp.energyhandbook.Dto.usersystem.UpdateStatusParam;
-import com.khaphp.energyhandbook.Dto.usersystem.UserSystemDTOUpdate;
-import com.khaphp.energyhandbook.Dto.usersystem.UserSystemDTOcreate;
+import com.khaphp.energyhandbook.Dto.usersystem.*;
 import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Repository.UserSystemRepository;
 import com.khaphp.energyhandbook.Service.UserSystemService;
@@ -67,6 +64,11 @@ public class UserSystemController {
     @PutMapping("/status")
     public ResponseEntity<?> updateStatus(@RequestBody @Valid UpdateStatusParam object){
         return ResponseEntity.ok(userSystemService.updateStatus(object));
+    }
+
+    @PutMapping("/email")
+    public ResponseEntity<?> updateEmail(@RequestBody @Valid UpdateEmailParam object){
+        return ResponseEntity.ok(userSystemService.updateEmail(object));
     }
 
     @PutMapping(

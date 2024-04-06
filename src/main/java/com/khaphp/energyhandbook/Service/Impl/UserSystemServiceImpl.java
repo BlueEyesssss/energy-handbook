@@ -287,4 +287,25 @@ public class UserSystemServiceImpl implements UserSystemService {
                     .build();
         }
     }
+
+    @Override
+    public ResponseObject<Object> updateEmail(UpdateEmailParam param) {
+        try{
+            UserSystem userSystem = userRepository.findById(param.getId()).orElse(null);
+            if(userSystem == null) {
+                throw new Exception("user not found");
+            }
+            userSystem.setEmail(param.getEmail());
+            userRepository.save(userSystem);
+            return ResponseObject.builder()
+                    .code(200)
+                    .message("Success")
+                    .build();
+        }catch (Exception e){
+            return ResponseObject.builder()
+                    .code(400)
+                    .message("Exception: " + e.getMessage())
+                    .build();
+        }
+    }
 }

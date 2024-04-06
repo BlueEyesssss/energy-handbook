@@ -17,6 +17,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.UUID;
 
@@ -45,6 +47,11 @@ public class EnergyHandbookApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(EnergyHandbookApplication.class, args);
 	}
+
+//	@Bean
+//	public JavaMailSender getJavaMailSender(){
+//		return new JavaMailSenderImpl();
+//	}
 
 	@Bean
 	public CommandLineRunner commandLineRunner(){
