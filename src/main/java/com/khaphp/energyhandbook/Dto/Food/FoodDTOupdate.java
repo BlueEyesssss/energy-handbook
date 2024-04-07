@@ -20,8 +20,8 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class FoodDTOcreate {
-    private String employeeId;
+public class FoodDTOupdate {
+    private String id;
     @Size(min=1, max=255, message = "name length from 1 to 255")
     private String name;
     @Size(min=1, max=50, message = "unit length from 1 to 50")

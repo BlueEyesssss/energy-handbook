@@ -2,10 +2,13 @@ package com.khaphp.energyhandbook;
 
 import com.khaphp.energyhandbook.Constant.Gender;
 import com.khaphp.energyhandbook.Constant.Role;
+import com.khaphp.energyhandbook.Dto.FoodEncylopedia.FoodEncylopediaDTOcreate;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Dto.usersystem.UserSystemDTOcreate;
+import com.khaphp.energyhandbook.Entity.FoodEncylopedia;
 import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Repository.UserSystemRepository;
+import com.khaphp.energyhandbook.Service.FoodEncylopediaService;
 import com.khaphp.energyhandbook.Service.UserSystemService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
@@ -44,18 +47,18 @@ public class EnergyHandbookApplication {
 	@Autowired
 	private UserSystemRepository userRepository;
 
+	@Autowired
+	private FoodEncylopediaService foodEncylopediaService;
+
 	public static void main(String[] args) {
 		SpringApplication.run(EnergyHandbookApplication.class, args);
 	}
 
-//	@Bean
-//	public JavaMailSender getJavaMailSender(){
-//		return new JavaMailSenderImpl();
-//	}
 
 	@Bean
 	public CommandLineRunner commandLineRunner(){
 		return args -> {
+			//default account
 			String emailDefaultCustomer = "customer@energy.handbook.com";
 			String emailDefaultEmployee = "employee@energy.handbook.com";
 			String emailDefaultShipper = "shipper@energy.handbook.com";
@@ -107,6 +110,15 @@ public class EnergyHandbookApplication {
 						.username("admin")
 						.build(), Role.ADMIN.toString());
 			}
+
+			//default food encylopedia
+			UserSystem employee = userRepository.findByEmail(emailDefaultEmployee);
+			foodEncylopediaService.create(FoodEncylopediaDTOcreate.builder()
+					.name("...")
+					.calo(0)
+					.unit("...")
+					.employeeId(employee.getId())
+					.build());
 		};
 	}
 

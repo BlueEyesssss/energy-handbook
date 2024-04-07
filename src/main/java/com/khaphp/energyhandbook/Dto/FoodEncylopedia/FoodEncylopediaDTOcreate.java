@@ -6,10 +6,7 @@ import com.khaphp.energyhandbook.Entity.UserSystem;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Date;
@@ -19,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class FoodEncylopediaDTOcreate {
     private String employeeId;
     @Size(min=1, max=255, message = "name length from 1 to 255")

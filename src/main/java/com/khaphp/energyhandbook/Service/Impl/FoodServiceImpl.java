@@ -1,13 +1,15 @@
 package com.khaphp.energyhandbook.Service.Impl;
 
-import com.khaphp.energyhandbook.Dto.News.NewsDTOcreate;
-import com.khaphp.energyhandbook.Dto.News.NewsDTOupdate;
+import com.khaphp.energyhandbook.Constant.Status;
+import com.khaphp.energyhandbook.Dto.Food.FoodDTOcreate;
+import com.khaphp.energyhandbook.Dto.Food.FoodDTOupdate;
+import com.khaphp.energyhandbook.Dto.Food.UpdateStatusFood;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
-import com.khaphp.energyhandbook.Entity.News;
+import com.khaphp.energyhandbook.Entity.Food;
 import com.khaphp.energyhandbook.Entity.UserSystem;
-import com.khaphp.energyhandbook.Repository.NewsRepository;
+import com.khaphp.energyhandbook.Repository.FoodRepository;
 import com.khaphp.energyhandbook.Service.FileStore;
-import com.khaphp.energyhandbook.Service.NewsService;
+import com.khaphp.energyhandbook.Service.FoodService;
 import com.khaphp.energyhandbook.Service.UserSystemService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +17,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
 
 @Service
-public class NewsServiceImpl implements NewsService {
+public class FoodServiceImpl implements FoodService {
     @Autowired
-    private NewsRepository newsRepository;
+    private FoodRepository foodRepository;
 
     @Autowired
     private UserSystemService userSystemService;
@@ -37,21 +38,20 @@ public class NewsServiceImpl implements NewsService {
 
     @Value("${aws.s3.link_bucket}")
     private String linkBucket;
-
     @Override
     public ResponseObject<Object> getAll(int pageSize, int pageIndex) {
-        Page<News> objListPage = null;
-        List<News> objList = null;
+        Page<Food> objListPage = null;
+        List<Food> objList = null;
         int totalPage = 0;
         //paging
         if(pageSize > 0 && pageIndex > 0){
-            objListPage = newsRepository.findAll(PageRequest.of(pageIndex - 1, pageSize));  //vì current page ở code nó start = 0, hay bên ngoài la 2pga đầu tiên hay 1
+            objListPage = foodRepository.findAll(PageRequest.of(pageIndex - 1, pageSize));  //vì current page ở code nó start = 0, hay bên ngoài la 2pga đầu tiên hay 1
             if(objListPage != null){
                 totalPage = objListPage.getTotalPages();
                 objList = objListPage.getContent();
             }
         }else{ //get all
-            objList = newsRepository.findAll();
+            objList = foodRepository.findAll();
             pageIndex = 1;
         }
         objList.forEach(object -> object.setImg(linkBucket + object.getImg()));
@@ -65,7 +65,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public ResponseObject<Object> getDetail(String id) {
         try{
-            News object = newsRepository.findById(id).orElse(null);
+            Food object = foodRepository.findById(id).orElse(null);
             if(object == null) {
                 throw new Exception("object not found");
             }
@@ -84,20 +84,21 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public ResponseObject<Object> create(NewsDTOcreate object) {
+    public ResponseObject<Object> create(FoodDTOcreate object) {
         try{
             UserSystem userSystem = (UserSystem) userSystemService.getDetail(object.getEmployeeId()).getData();
             if(userSystem == null){
                 throw new Exception("user not found");
             }
-            News news = modelMapper.map(object, News.class);
-            news.setUpdateDate(new Date(System.currentTimeMillis()));
-            news.setEmployee(userSystem);
-            newsRepository.save(news);
+            Food object1 = modelMapper.map(object, Food.class);
+            object1.setUpdateDate(new Date(System.currentTimeMillis()));
+            object1.setEmployee(userSystem);
+            object1.setStatus(Status.ACTIVE.toString());
+            foodRepository.save(object1);
             return ResponseObject.builder()
                     .code(200)
                     .message("Success")
-                    .data(news)
+                    .data(object1)
                     .build();
         }catch (Exception e){
             return ResponseObject.builder()
@@ -108,16 +109,20 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public ResponseObject<Object> update(NewsDTOupdate object) {
+    public ResponseObject<Object> update(FoodDTOupdate object) {
         try{
-            News object1 = newsRepository.findById(object.getId()).orElse(null);
+            Food object1 = foodRepository.findById(object.getId()).orElse(null);
             if(object1 == null) {
                 throw new Exception("object not found");
-            }
-            object1.setTitle(object.getTitle());
-            object1.setBody(object.getBody());
+            }   // name unit stoc, price, sale location
+            object1.setName(object.getName());
+            object1.setUnit(object.getUnit());
+            object1.setStock(object.getStock());
+            object1.setPrice(object.getPrice());
+            object1.setLocation(object.getLocation());
+            object1.setSale(object.getSale());
             object1.setUpdateDate(new Date(System.currentTimeMillis()));
-            newsRepository.save(object1);
+            foodRepository.save(object1);
             return ResponseObject.builder()
                     .code(200)
                     .message("Success")
@@ -131,10 +136,9 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public ResponseObject<Object> updateImage(String id, MultipartFile file) {
         try{
-            News object = newsRepository.findById(id).orElse(null);
+            Food object = foodRepository.findById(id).orElse(null);
             if(object == null) {
                 throw new Exception("object not found");
             }
@@ -148,7 +152,28 @@ public class NewsServiceImpl implements NewsService {
             }
             //upload new img
             object.setImg(fileStore.uploadImg(file));
-            newsRepository.save(object);
+            foodRepository.save(object);
+            return ResponseObject.builder()
+                    .code(200)
+                    .message("Success")
+                    .build();
+        }catch (Exception e){
+            return ResponseObject.builder()
+                    .code(400)
+                    .message("Exception: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @Override
+    public ResponseObject<Object> updateStatus(UpdateStatusFood object1) {
+        try{
+            Food object = foodRepository.findById(object1.getId()).orElse(null);
+            if(object == null) {
+                throw new Exception("object not found");
+            }
+            object.setStatus(object1.getStatus());
+            foodRepository.save(object);
             return ResponseObject.builder()
                     .code(200)
                     .message("Success")
@@ -164,7 +189,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public ResponseObject<Object> delete(String id) {
         try{
-            News object = newsRepository.findById(id).orElse(null);
+            Food object = foodRepository.findById(id).orElse(null);
             if(object == null) {
                 throw new Exception("object not found");
             }
@@ -176,7 +201,7 @@ public class NewsServiceImpl implements NewsService {
                 // img is null =>continue
             }
 
-            newsRepository.delete(object);
+            foodRepository.delete(object);
             return ResponseObject.builder()
                     .code(200)
                     .message("Success")
