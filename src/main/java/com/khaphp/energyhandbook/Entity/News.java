@@ -25,7 +25,7 @@ public class News {
     private String id;
     private String title;
     private String body;
-    private Date createDate;
+    private Date updateDate;
     private String img;
 
     @ManyToOne

@@ -1,6 +1,7 @@
 package com.khaphp.energyhandbook.Controller;
 
 import com.khaphp.energyhandbook.Constant.Role;
+import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Dto.usersystem.*;
 import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Repository.UserSystemRepository;
@@ -29,51 +30,91 @@ public class UserSystemController {
 //            "'ROLE_"+Role.EMPLOYEE+"'" +
 //            ")")
     public ResponseEntity<?> getAll(){
-        return ResponseEntity.ok(userSystemService.getAll());
+        ResponseObject responseObject = userSystemService.getAll();
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
     @GetMapping("/detail")
     public ResponseEntity<?> getObject(String id){
-        return ResponseEntity.ok(userSystemService.getDetail(id));
+        ResponseObject responseObject = userSystemService.getDetail(id);
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
 
     @PostMapping("/customer")
     public ResponseEntity<?> createObject(@RequestBody @Valid UserSystemDTOcreate object){
-        return ResponseEntity.ok(userSystemService.create(object, Role.CUSTOMER.toString()));
+        ResponseObject responseObject = userSystemService.create(object, Role.CUSTOMER.toString());
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
 
     @PostMapping("/employee")
     public ResponseEntity<?> createObject2(@RequestBody @Valid UserSystemDTOcreate object){
-        return ResponseEntity.ok(userSystemService.create(object, Role.EMPLOYEE.toString()));
+        ResponseObject responseObject = userSystemService.create(object, Role.EMPLOYEE.toString());
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
 
     @PostMapping("/shipper")
     public ResponseEntity<?> createObject3(@RequestBody @Valid UserSystemDTOcreate object){
-        return ResponseEntity.ok(userSystemService.create(object, Role.SHIPPER.toString()));
+        ResponseObject responseObject = userSystemService.create(object, Role.SHIPPER.toString());
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
 
     @PutMapping
     public ResponseEntity<?> updateObject(@RequestBody @Valid UserSystemDTOUpdate object){
-        return ResponseEntity.ok(userSystemService.update(object));
+        ResponseObject responseObject = userSystemService.update(object);
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
 
     @PutMapping("/change-pwd")
     public ResponseEntity<?> changePwd(@RequestBody @Valid ChangePwdParam object){
-        return ResponseEntity.ok(userSystemService.changePassword(object));
+        ResponseObject responseObject = userSystemService.changePassword(object);
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
 
     @PutMapping("/new-pwd")
     public ResponseEntity<?> newPwd(@RequestBody @Valid NewPwdParam object){
-        return ResponseEntity.ok(userSystemService.updatePassword(object));
+        ResponseObject responseObject = userSystemService.updatePassword(object);
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
 
     @PutMapping("/status")
     public ResponseEntity<?> updateStatus(@RequestBody @Valid UpdateStatusParam object){
-        return ResponseEntity.ok(userSystemService.updateStatus(object));
+        ResponseObject responseObject = userSystemService.updateStatus(object);
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
 
     @PutMapping("/email")
     public ResponseEntity<?> updateEmail(@RequestBody @Valid UpdateEmailParam object){
-        return ResponseEntity.ok(userSystemService.updateEmail(object));
+        ResponseObject responseObject = userSystemService.updateEmail(object);
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
 
     @PutMapping(
@@ -83,11 +124,19 @@ public class UserSystemController {
     )
     public ResponseEntity<?> updateImage(@RequestParam("id") String id,
                                          @RequestParam("file") MultipartFile file){
-        return ResponseEntity.ok(userSystemService.updateImage(id, file));
+        ResponseObject responseObject = userSystemService.updateImage(id, file);
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
 
     @DeleteMapping
     public ResponseEntity<?> deleteObject(String id){
-        return ResponseEntity.ok(userSystemService.delete(id));
+        ResponseObject responseObject = userSystemService.delete(id);
+        if(responseObject.getCode() == 200){
+            return ResponseEntity.ok(responseObject);
+        }
+        return ResponseEntity.badRequest().body(responseObject);
     }
 }

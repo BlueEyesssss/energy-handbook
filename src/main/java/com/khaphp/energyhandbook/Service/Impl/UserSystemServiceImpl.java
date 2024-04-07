@@ -55,10 +55,12 @@ public class UserSystemServiceImpl implements UserSystemService {
 
     @Override
     public ResponseObject<Object> getAll() {
+        List<UserSystem> userSystems = userRepository.findAll();
+        userSystems.forEach(userSystem -> userSystem.setImgUrl(linkBucket + userSystem.getImgUrl()));
         return ResponseObject.builder()
                 .code(200)
                 .message("Success")
-                .data(userRepository.findAll())
+                .data(userSystems)
                 .build();
     }
 
@@ -140,50 +142,17 @@ public class UserSystemServiceImpl implements UserSystemService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ResponseObject<Object> updateImage(String id, MultipartFile file) {
-        String pathFileName = String.format("%s", UUID.randomUUID() + "_"+ file.getOriginalFilename());     //format: [UUID]_[name_img_from_local]
-        //vd: 808930ba-f2e7-46b2-9110-451ce7b0a28a_face1.jpg --> nó lưu thằng trong folder buket của mình luôn
-        //nếu format: A/[UUID]_[name_img_from_local] hay A/808930ba-f2e7-46b2-9110-451ce7b0a28a_face1.jpg
-        // --> thì nó sẽ tạo thếm folder mới tên là A trong folder Bucket của mình và luu ảnh trong folder A đó
-        // dựa vào đây có thể tạo nhiều folder cho từng user để có thể dễ quản lý img, file của họ
         try{
             //find user
             UserSystem userSystem = userRepository.findById(id).orElse(null);
             if(userSystem == null) {
                 throw new Exception("user not found");
             }
-
-            //check if the file is empty
-            if (file.isEmpty()) {
-                throw new IllegalStateException("Cannot upload empty file");
+            if(!userSystem.getImgUrl().equals("")){
+                fileStore.deleteImage(userSystem.getImgUrl());
             }
-            //check size <10Mb, 1MB = 1 048 576 bytes
-            if(file.getSize() >= 10 * 1048576){
-                throw new IllegalStateException("IMG size must smaller than 10MB");
-            }
-            //Check if the file is an image
-            if (!Arrays.asList(IMAGE_PNG.getMimeType(),
-                    IMAGE_BMP.getMimeType(),
-                    IMAGE_GIF.getMimeType(),
-                    IMAGE_JPEG.getMimeType()).contains(file.getContentType())) {
-                throw new IllegalStateException("FIle uploaded is not an image");
-            }
-            //get file metadata
-            Map<String, String> metadata = new HashMap<>();
-            metadata.put("Content-Type", file.getContentType());
-            metadata.put("Content-Length", String.valueOf(file.getSize()));
-
-            try {
-                fileStore.upload(pathFileName, Optional.of(metadata), file.getInputStream());
-            } catch (IOException e) {
-                throw new IllegalStateException("Failed to upload file: " +e.getMessage());
-            }
-
-            try{
-                userSystem.setImgUrl(pathFileName);
-                userRepository.save(userSystem);
-            }catch (Exception e){
-                fileStore.deleteImage(pathFileName);
-            }
+            userSystem.setImgUrl(fileStore.uploadImg(file));
+            userRepository.save(userSystem);
             return ResponseObject.builder()
                     .code(200)
                     .message("Success")
