@@ -82,6 +82,10 @@ public class UserSystem implements UserDetails {
     @JsonIgnore
     private List<Interact> interacts;
 
+    @OneToMany(mappedBy = "employee")
+    @JsonIgnore
+    private List<FoodEncylopedia> foodEncylogies;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_"+role));

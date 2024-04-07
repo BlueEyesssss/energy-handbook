@@ -16,30 +16,22 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Food {
+public class FoodEncylopedia {
     @Id
     @UuidGenerator
     @Column(columnDefinition = "VARCHAR(36)")
     private String id;
     private String name;
     private String unit;
-    private float stock;
-    private float price;
-    private short sale; //from 1 to 100
-    private String img;
-    private String location;
+    private float calo;
     private Date updateDate;
-    private String status;
+    private String img;
+
+    @OneToMany(mappedBy = "foodEncylopedia")
+    @JsonIgnore
+    private List<Food> foods;
 
     @ManyToOne
     @JsonIgnore
     private UserSystem employee;
-
-    @OneToMany(mappedBy = "food")
-    @JsonIgnore
-    private List<OrderDetail> orderDetails;
-
-    @ManyToOne
-    @JsonIgnore
-    private FoodEncylopedia foodEncylopedia;
 }

@@ -148,8 +148,12 @@ public class UserSystemServiceImpl implements UserSystemService {
             if(userSystem == null) {
                 throw new Exception("user not found");
             }
-            if(!userSystem.getImgUrl().equals("")){
-                fileStore.deleteImage(userSystem.getImgUrl());
+            try {
+                if(!userSystem.getImgUrl().equals("")){
+                    fileStore.deleteImage(userSystem.getImgUrl());
+                }
+            }catch (Exception e){
+                // img is null =>continue
             }
             userSystem.setImgUrl(fileStore.uploadImg(file));
             userRepository.save(userSystem);
@@ -172,9 +176,14 @@ public class UserSystemServiceImpl implements UserSystemService {
             if(userSystem == null) {
                 throw new Exception("user not found");
             }
-            if(!userSystem.getImgUrl().equals("")){
-                fileStore.deleteImage(userSystem.getImgUrl());
+            try{
+                if(!userSystem.getImgUrl().equals("")){
+                    fileStore.deleteImage(userSystem.getImgUrl());
+                }
+            }catch (Exception e){
+                // img is null =>continue
             }
+
             userRepository.delete(userSystem);
             return ResponseObject.builder()
                     .code(200)
