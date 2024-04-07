@@ -22,8 +22,9 @@ public class NewsController {
     private NewsService newsService;
 
     @GetMapping
-    public ResponseEntity<?> getAll(){
-        ResponseObject responseObject = newsService.getAll();
+    public ResponseEntity<?> getAll(@RequestParam(defaultValue = "10") int pageSize,
+                                    @RequestParam(defaultValue = "1") int pageIndex){
+        ResponseObject responseObject = newsService.getAll(pageSize, pageIndex);
         if(responseObject.getCode() == 200){
             return ResponseEntity.ok(responseObject);
         }

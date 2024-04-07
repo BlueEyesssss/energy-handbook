@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface FoodEncylopediaService {
 
-    ResponseObject<Object> getAll();
+    ResponseObject<Object> getAll(int pageSize, int pageIndex);
     ResponseObject<Object> getDetail(String id);
     ResponseObject<Object> create(FoodEncylopediaDTOcreate object);
     ResponseObject<Object> update(FoodEncylopediaDTOupdate object);

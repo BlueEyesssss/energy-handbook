@@ -22,8 +22,9 @@ public class FoodEncylopediaController {
     private FoodEncylopediaService foodEncylopediaService;
 
     @GetMapping
-    public ResponseEntity<?> getAll(){
-        ResponseObject responseObject = foodEncylopediaService.getAll();
+    public ResponseEntity<?> getAll(@RequestParam(defaultValue = "10") int pageSize,
+                                    @RequestParam(defaultValue = "1") int pageIndex){
+        ResponseObject responseObject = foodEncylopediaService.getAll(pageSize, pageIndex);
         if(responseObject.getCode() == 200){
             return ResponseEntity.ok(responseObject);
         }

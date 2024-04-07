@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface NewsService {
 
-    ResponseObject<Object> getAll();
+    ResponseObject<Object> getAll(int pageSize, int pageIndex);
     ResponseObject<Object> getDetail(String id);
     ResponseObject<Object> create(NewsDTOcreate object);
     ResponseObject<Object> update(NewsDTOupdate object);

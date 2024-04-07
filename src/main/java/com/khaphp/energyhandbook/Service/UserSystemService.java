@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UserSystemService {
 
-    ResponseObject<Object> getAll();
+    ResponseObject<Object> getAll(int pageSize, int pageIndex);
     ResponseObject<Object> getDetail(String id);
     ResponseObject<Object> create(UserSystemDTOcreate object, String role);
     ResponseObject<Object> update(UserSystemDTOUpdate object);

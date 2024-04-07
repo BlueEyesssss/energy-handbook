@@ -13,6 +13,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -54,13 +57,26 @@ public class UserSystemServiceImpl implements UserSystemService {
     }
 
     @Override
-    public ResponseObject<Object> getAll() {
-        List<UserSystem> userSystems = userRepository.findAll();
-        userSystems.forEach(userSystem -> userSystem.setImgUrl(linkBucket + userSystem.getImgUrl()));
+    public ResponseObject<Object> getAll(int pageSize, int pageIndex) {
+        Page<UserSystem> objListPage = null;
+        List<UserSystem> objList = null;
+        int totalPage = 0;
+        //paging
+        if(pageSize > 0 && pageIndex > 0){
+            objListPage = userRepository.findAll(PageRequest.of(pageIndex - 1, pageSize));  //vì current page ở code nó start = 0, hay bên ngoài la 2pga đầu tiên hay 1
+            if(objListPage != null){
+                totalPage = objListPage.getTotalPages();
+                objList = objListPage.getContent();
+            }
+        }else{ //get all
+            objList = userRepository.findAll();
+            pageIndex = 1;
+        }
+        objList.forEach(userSystem -> userSystem.setImgUrl(linkBucket + userSystem.getImgUrl()));
         return ResponseObject.builder()
-                .code(200)
-                .message("Success")
-                .data(userSystems)
+                .code(200).message("Success")
+                .pageSize(objList.size()).pageIndex(pageIndex).totalPage(totalPage)
+                .data(objList)
                 .build();
     }
 
@@ -71,7 +87,15 @@ public class UserSystemServiceImpl implements UserSystemService {
             if(userSystem == null) {
                 throw new Exception("user not found");
             }
-            userSystem.setImgUrl(linkBucket + userSystem.getImgUrl());
+            try {
+                if(userSystem.getImgUrl() != null){
+                    userSystem.setImgUrl(linkBucket + userSystem.getImgUrl());
+                }
+            }catch (Exception e){
+
+            }
+
+//            userSystem.setImgUrl(linkBucket + userSystem.getImgUrl());
             return ResponseObject.builder()
                     .code(200)
                     .message("Found")

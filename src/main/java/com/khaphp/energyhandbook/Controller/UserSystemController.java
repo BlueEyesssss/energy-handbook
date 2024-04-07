@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("api/v1/customer")
+@RequestMapping("api/v1/user-system")
 //@SecurityRequirement(name = "EnergyHandbook")
 public class UserSystemController {
     @Autowired
@@ -29,8 +29,9 @@ public class UserSystemController {
 //            "'ROLE_"+Role.ADMIN+"'," +
 //            "'ROLE_"+Role.EMPLOYEE+"'" +
 //            ")")
-    public ResponseEntity<?> getAll(){
-        ResponseObject responseObject = userSystemService.getAll();
+    public ResponseEntity<?> getAll(@RequestParam(defaultValue = "10") int pageSize,
+                                    @RequestParam(defaultValue = "1") int pageIndex){
+        ResponseObject responseObject = userSystemService.getAll(pageSize, pageIndex);
         if(responseObject.getCode() == 200){
             return ResponseEntity.ok(responseObject);
         }

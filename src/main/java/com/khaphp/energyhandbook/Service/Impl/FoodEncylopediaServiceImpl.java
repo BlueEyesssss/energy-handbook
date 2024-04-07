@@ -17,6 +17,8 @@ import com.khaphp.energyhandbook.Service.UserSystemService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,13 +45,26 @@ public class FoodEncylopediaServiceImpl implements FoodEncylopediaService {
 
 
     @Override
-    public ResponseObject<Object> getAll() {
-        List<FoodEncylopedia> list = foodEncylopediaRepository.findAll();
-        list.forEach(object -> object.setImg(linkBucket + object.getImg()));
+    public ResponseObject<Object> getAll(int pageSize, int pageIndex) {
+        Page<FoodEncylopedia> objListPage = null;
+        List<FoodEncylopedia> objList = null;
+        int totalPage = 0;
+        //paging
+        if(pageSize > 0 && pageIndex > 0){
+            objListPage = foodEncylopediaRepository.findAll(PageRequest.of(pageIndex - 1, pageSize));  //vì current page ở code nó start = 0, hay bên ngoài la 2pga đầu tiên hay 1
+            if(objListPage != null){
+                totalPage = objListPage.getTotalPages();
+                objList = objListPage.getContent();
+            }
+        }else{ //get all
+            objList = foodEncylopediaRepository.findAll();
+            pageIndex = 1;
+        }
+        objList.forEach(object -> object.setImg(linkBucket + object.getImg()));
         return ResponseObject.builder()
-                .code(200)
-                .message("Success")
-                .data(list)
+                .code(200).message("Success")
+                .pageSize(objList.size()).pageIndex(pageIndex).totalPage(totalPage)
+                .data(objList)
                 .build();
     }
 
