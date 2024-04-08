@@ -3,10 +3,13 @@ package com.khaphp.energyhandbook.Service.Impl;
 import com.khaphp.energyhandbook.Constant.Role;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Dto.Wallet.WalletDTOupdate;
+import com.khaphp.energyhandbook.Dto.WalletTransaction.WalletTransactionDTOcreate;
 import com.khaphp.energyhandbook.Entity.UserSystem;
+import com.khaphp.energyhandbook.Entity.WalletTransaction;
 import com.khaphp.energyhandbook.Service.PaymentService;
 import com.khaphp.energyhandbook.Service.UserSystemService;
 import com.khaphp.energyhandbook.Service.WalletService;
+import com.khaphp.energyhandbook.Service.WalletTransactionService;
 import com.khaphp.energyhandbook.Util.VnPayHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private WalletService walletService;
+
+    @Autowired
+    private WalletTransactionService walletTransactionService;
     @Override
     public ResponseObject<?> createPayment(HttpServletRequest req, int amount_param, String customerId, UserSystemService userSystemService) {
         try {
@@ -61,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
 //            vnp_Params.put("vnp_BankCode", bankCode);     //còn nếu mú chỉ định thì cứ ghi ngân hàng đó ra, chữ in hoa, vd: NCB, VIETCOMBANK, ..
 //        }
             vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-            vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang: " + vnp_TxnRef + " cua UserID: " + customerId);   //nội dung thanh toán, nhưng ở đây ta fix cứng như bên trái cho lẹ, hợp vs mọi tình huống
+            vnp_Params.put("vnp_OrderInfo", "Nap tien vao vi Energy Handbook: " + vnp_TxnRef + " cua UserID: " + customerId);   //chữ ko dấu nha
             vnp_Params.put("vnp_OrderType", orderType);
 
 //        String locate = req.getParameter("language");
@@ -126,19 +132,19 @@ public class PaymentServiceImpl implements PaymentService {
 
     /*
     * http://localhost:8080/api/payment/payment_result
-?vnp_Amount=1000000
-&vnp_BankCode=NCB
-&vnp_BankTranNo=VNP14370274
-&vnp_CardType=ATM
-&vnp_OrderInfo=Thanh+toan+don+hang%3A+91730521+cua+UserID:3A+867071a2-b0c8-48e3-9cf3-19815f8fb45e
-&vnp_PayDate=20240408114800
-&vnp_ResponseCode=00
-&vnp_TmnCode=QE1PYQ1B
-&vnp_TransactionNo=14370274
-&vnp_TransactionStatus=00
-&vnp_TxnRef=91730521
-&vnp_SecureHash=91d92dc780297f47f071480913a7a59bb932cf6bb309480d782e0e869d70d05da2d8e3cc98473a416270a4001a76859fd2f4835257233df11e9bda885caf1afd
-    * */
+    ?vnp_Amount=1000000
+    &vnp_BankCode=NCB
+    &vnp_BankTranNo=VNP14370274
+    &vnp_CardType=ATM
+    &vnp_OrderInfo=Thanh+toan+don+hang%3A+91730521+cua+UserID:3A+867071a2-b0c8-48e3-9cf3-19815f8fb45e
+    &vnp_PayDate=20240408114800
+    &vnp_ResponseCode=00
+    &vnp_TmnCode=QE1PYQ1B
+    &vnp_TransactionNo=14370274
+    &vnp_TransactionStatus=00
+    &vnp_TxnRef=91730521
+    &vnp_SecureHash=91d92dc780297f47f071480913a7a59bb932cf6bb309480d782e0e869d70d05da2d8e3cc98473a416270a4001a76859fd2f4835257233df11e9bda885caf1afd
+        * */
 
     @Override
     public ResponseObject<?> resultTransaction(String vnp_Amount, String vnp_BankCode, String vnp_OrderInfo, String vnp_PayDate, String vnp_ResponseCode) {
@@ -166,16 +172,16 @@ public class PaymentServiceImpl implements PaymentService {
                             throw new Exception(rs.getMessage());
                         }
                         //cập nhật transaction này
-//                        Transaction paymentTransaction = new Transaction();
-//                        paymentTransaction.setWallet(userSystem.getWallet());
-//                        String formatvnp_PayDate = vnp_PayDate.substring(0, 4) + "-" + vnp_PayDate.substring(4, 6) + "-" + vnp_PayDate.substring(6, 8)
-//                                + " " + vnp_PayDate.substring(8, 10) + ":" + vnp_PayDate.substring(10, 12) + ":" + vnp_PayDate.substring(12, 14);
-//                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                        paymentTransaction.setDate(format.parse(formatvnp_PayDate));    // vnp_PayDate format: yyyyMMddHHmmss -> formatvnp_PayDate: yyyy-MM-dd HH:mm:ss
-//                        paymentTransaction.setAmount(Integer.parseInt(vnp_Amount) / 100);
-//                        paymentTransaction.setBankCode(vnp_BankCode);
-//                        paymentTransaction.setDescription(vnp_OrderInfo);
-//                        transactionRepo.save(paymentTransaction);
+                        String formatvnp_PayDate = vnp_PayDate.substring(0, 4) + "-" + vnp_PayDate.substring(4, 6) + "-" + vnp_PayDate.substring(6, 8)
+                                + " " + vnp_PayDate.substring(8, 10) + ":" + vnp_PayDate.substring(10, 12) + ":" + vnp_PayDate.substring(12, 14);
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        rs = walletTransactionService.create(WalletTransactionDTOcreate.builder()
+                                .customerId(idCus).amount(Integer.parseInt(vnp_Amount) / 100)
+                                .description(vnp_OrderInfo).createDate(format.parse(formatvnp_PayDate))
+                                .build());
+                        if(rs.getCode() != 200){
+                            log.error("Error create transaction : " + rs.getMessage());
+                        }
                     }
                 }
 
