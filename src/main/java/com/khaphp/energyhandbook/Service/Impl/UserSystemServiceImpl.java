@@ -3,11 +3,13 @@ package com.khaphp.energyhandbook.Service.Impl;
 import com.khaphp.energyhandbook.Constant.Role;
 import com.khaphp.energyhandbook.Constant.Status;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
+import com.khaphp.energyhandbook.Dto.Wallet.WalletDTOcreate;
 import com.khaphp.energyhandbook.Dto.usersystem.*;
 import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Repository.UserSystemRepository;
 import com.khaphp.energyhandbook.Service.FileStore;
 import com.khaphp.energyhandbook.Service.UserSystemService;
+import com.khaphp.energyhandbook.Service.WalletService;
 import com.khaphp.energyhandbook.Util.Security.JwtHelper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,9 @@ public class UserSystemServiceImpl implements UserSystemService {
 
     @Autowired
     private JwtHelper jwtHelper;
+
+    @Autowired
+    private WalletService walletService;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -125,7 +130,11 @@ public class UserSystemServiceImpl implements UserSystemService {
             userSystem.setRole(role);
             userSystem.setPremium(false);
             userSystem.setBirthday(new Date(object.getBirthdayL() * 1000));
-            userRepository.save(userSystem);
+            userSystem = userRepository.save(userSystem);
+
+            //create wallet
+            walletService.create(WalletDTOcreate.builder().customerId(userSystem.getId()).build(), this);
+
             return ResponseObject.builder()
                     .code(200)
                     .message("Success")
@@ -207,7 +216,8 @@ public class UserSystemServiceImpl implements UserSystemService {
             }catch (Exception e){
                 // img is null =>continue
             }
-
+            //delete wallet
+            walletService.delete(userSystem.getWallet().getId());
             userRepository.delete(userSystem);
             return ResponseObject.builder()
                     .code(200)
