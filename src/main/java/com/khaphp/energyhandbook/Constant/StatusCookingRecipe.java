@@ -2,6 +2,6 @@ package com.khaphp.energyhandbook.Constant;
 
 public enum StatusCookingRecipe {
     PRIVATE,
-    PUBLISH,
+    PUBLIC,
     BAN
 }

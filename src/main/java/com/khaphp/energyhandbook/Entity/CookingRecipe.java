@@ -25,7 +25,7 @@ public class CookingRecipe {
     private String name;
     private String productImg;
     private String level;
-    private Time timeCook;
+    private float timeCook;
     private Date updateDate;
     private short mealServing;
     private String description;
