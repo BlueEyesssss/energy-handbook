@@ -7,6 +7,7 @@ import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Dto.usersystem.UserSystemDTOcreate;
 import com.khaphp.energyhandbook.Entity.FoodEncylopedia;
 import com.khaphp.energyhandbook.Entity.UserSystem;
+import com.khaphp.energyhandbook.Repository.FoodEncylopediaRepository;
 import com.khaphp.energyhandbook.Repository.UserSystemRepository;
 import com.khaphp.energyhandbook.Service.FoodEncylopediaService;
 import com.khaphp.energyhandbook.Service.UserSystemService;
@@ -49,6 +50,8 @@ public class EnergyHandbookApplication {
 
 	@Autowired
 	private FoodEncylopediaService foodEncylopediaService;
+	@Autowired
+	private FoodEncylopediaRepository foodEncylopediaRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(EnergyHandbookApplication.class, args);
@@ -113,12 +116,15 @@ public class EnergyHandbookApplication {
 
 			//default food encylopedia
 			UserSystem employee = userRepository.findByEmail(emailDefaultEmployee);
-			foodEncylopediaService.create(FoodEncylopediaDTOcreate.builder()
-					.name("...")
-					.calo(0)
-					.unit("...")
-					.employeeId(employee.getId())
-					.build());
+			FoodEncylopedia foodEncylopedia = foodEncylopediaRepository.findByName("...");
+			if(foodEncylopedia == null){
+				foodEncylopediaService.create(FoodEncylopediaDTOcreate.builder()
+						.name("...")
+						.calo(0)
+						.unit("...")
+						.employeeId(employee.getId())
+						.build());
+			}
 		};
 	}
 

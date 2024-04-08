@@ -65,7 +65,7 @@ public class WalletServiceImpl implements WalletService {
     public ResponseObject<Object> updateBalance(WalletDTOupdate object, UserSystemService userSystemService) {
         try {
             UserSystem customer = (UserSystem) userSystemService.getDetail(object.getCustomerId()).getData();
-            if(customer == null || !customer.getRole().equals(Role.EMPLOYEE)){
+            if(customer == null || !customer.getRole().equals(Role.CUSTOMER)){
                 throw new Exception("customer not found");
             }
             customer.getWallet().setBalance(customer.getWallet().getBalance() + object.getBalance());

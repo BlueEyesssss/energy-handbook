@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FoodEncylopediaRepository extends JpaRepository<FoodEncylopedia, String> {
+    FoodEncylopedia findByName(String name);
 }
