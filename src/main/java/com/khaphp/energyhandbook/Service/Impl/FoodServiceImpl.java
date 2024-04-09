@@ -38,6 +38,10 @@ public class FoodServiceImpl implements FoodService {
 
     @Value("${aws.s3.link_bucket}")
     private String linkBucket;
+
+    @Value("${logo.energy_handbook.name}")
+    private String logoName;
+
     @Override
     public ResponseObject<Object> getAll(int pageSize, int pageIndex) {
         Page<Food> objListPage = null;
@@ -94,6 +98,7 @@ public class FoodServiceImpl implements FoodService {
             object1.setUpdateDate(new Date(System.currentTimeMillis()));
             object1.setEmployee(userSystem);
             object1.setStatus(Status.ACTIVE.toString());
+            object1.setImg(logoName);
             foodRepository.save(object1);
             return ResponseObject.builder()
                     .code(200)
@@ -142,13 +147,8 @@ public class FoodServiceImpl implements FoodService {
             if(object == null) {
                 throw new Exception("object not found");
             }
-            try{
-                //delete old img
-                if(!object.getImg().equals("")){
-                    fileStore.deleteImage(object.getImg());
-                }
-            }catch (Exception e){
-                // img is null =>continue
+            if(!object.getImg().equals(logoName)){
+                fileStore.deleteImage(object.getImg());
             }
             //upload new img
             object.setImg(fileStore.uploadImg(file));
@@ -193,12 +193,8 @@ public class FoodServiceImpl implements FoodService {
             if(object == null) {
                 throw new Exception("object not found");
             }
-            try{
-                if(!object.getImg().equals("")){
-                    fileStore.deleteImage(object.getImg());
-                }
-            }catch (Exception e){
-                // img is null =>continue
+            if(!object.getImg().equals(logoName)){
+                fileStore.deleteImage(object.getImg());
             }
 
             foodRepository.delete(object);

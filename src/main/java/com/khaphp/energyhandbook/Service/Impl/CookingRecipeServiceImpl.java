@@ -42,6 +42,9 @@ public class CookingRecipeServiceImpl implements CookingRecipeService {
 
     @Value("${aws.s3.link_bucket}")
     private String linkBucket;
+
+    @Value("${logo.energy_handbook.name}")
+    private String logoName;
     @Override
     public ResponseObject<Object> getAll(int pageSize, int pageIndex, String customerId) {
         Page<CookingRecipe> objListPage = null;
@@ -102,6 +105,7 @@ public class CookingRecipeServiceImpl implements CookingRecipeService {
             cookingRecipe.setUpdateDate(new Date(System.currentTimeMillis()));
             cookingRecipe.setEmployee(userSystemRepository.findByEmail(DEFAULT_EMPLOYEE_MAIL));
             cookingRecipe.setCustomer(userSystem);
+            cookingRecipe.setProductImg(logoName);
             cookingRecipeRepository.save(cookingRecipe);
             return ResponseObject.builder()
                     .code(200)
@@ -180,14 +184,9 @@ public class CookingRecipeServiceImpl implements CookingRecipeService {
             if(object == null) {
                 throw new Exception("object not found");
             }
-            try{
-                if(!object.getProductImg().equals("")){
-                    fileStore.deleteImage(object.getProductImg());
-                }
-            }catch (Exception e){
-                // img is null =>continue
+            if(!object.getProductImg().equals(logoName)){
+                fileStore.deleteImage(object.getProductImg());
             }
-
             cookingRecipeRepository.delete(object);
             return ResponseObject.builder()
                     .code(200)

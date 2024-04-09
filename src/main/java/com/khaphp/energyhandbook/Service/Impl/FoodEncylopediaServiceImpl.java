@@ -43,7 +43,8 @@ public class FoodEncylopediaServiceImpl implements FoodEncylopediaService {
     @Value("${aws.s3.link_bucket}")
     private String linkBucket;
 
-
+    @Value("${logo.energy_handbook.name}")
+    private String logoName;
     @Override
     public ResponseObject<Object> getAll(int pageSize, int pageIndex) {
         Page<FoodEncylopedia> objListPage = null;
@@ -99,6 +100,7 @@ public class FoodEncylopediaServiceImpl implements FoodEncylopediaService {
             FoodEncylopedia object1 = modelMapper.map(object, FoodEncylopedia.class);
             object1.setUpdateDate(new Date(System.currentTimeMillis()));
             object1.setEmployee(userSystem);
+            object1.setImg(logoName);
             foodEncylopediaRepository.save(object1);
             return ResponseObject.builder()
                     .code(200)
@@ -144,13 +146,8 @@ public class FoodEncylopediaServiceImpl implements FoodEncylopediaService {
             if(object == null) {
                 throw new Exception("object not found");
             }
-            try{
-                //delete old img
-                if(!object.getImg().equals("")){
-                    fileStore.deleteImage(object.getImg());
-                }
-            }catch (Exception e){
-                // img is null =>continue
+            if(!object.getImg().equals(logoName)){
+                fileStore.deleteImage(object.getImg());
             }
 
             //upload new img
@@ -175,12 +172,8 @@ public class FoodEncylopediaServiceImpl implements FoodEncylopediaService {
             if(object == null) {
                 throw new Exception("object not found");
             }
-            try{
-                if(!object.getImg().equals("")){
-                    fileStore.deleteImage(object.getImg());
-                }
-            }catch (Exception e){
-                // img is null =>continue
+            if(!object.getImg().equals(logoName)){
+                fileStore.deleteImage(object.getImg());
             }
             foodEncylopediaRepository.delete(object);
             return ResponseObject.builder()

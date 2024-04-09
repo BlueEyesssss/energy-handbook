@@ -1,12 +1,10 @@
 package com.khaphp.energyhandbook.Service.Impl;
 
-import com.khaphp.energyhandbook.Dto.News.NewsDTOupdate;
 import com.khaphp.energyhandbook.Dto.RecipeIngredirents.RecipeIngredientsDTOcreate;
 import com.khaphp.energyhandbook.Dto.RecipeIngredirents.RecipeIngredientsDTOcreateItem;
 import com.khaphp.energyhandbook.Dto.RecipeIngredirents.RecipeIngredientsDTOupdateItem;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Entity.CookingRecipe;
-import com.khaphp.energyhandbook.Entity.News;
 import com.khaphp.energyhandbook.Entity.RecipeIngredients;
 import com.khaphp.energyhandbook.Repository.RecipeIngredientsRepository;
 import com.khaphp.energyhandbook.Service.CookingRecipeService;
@@ -39,6 +37,9 @@ public class RecipeIngredientsServiceImpl implements RecipeIngredientsService {
 
     @Value("${aws.s3.link_bucket}")
     private String linkBucket;
+
+    @Value("${logo.energy_handbook.name}")
+    private String logoName;
     @Override
     public ResponseObject<Object> getAll(int pageSize, int pageIndex, String cookingRecipeId) {
         Page<RecipeIngredients> objListPage = null;
@@ -107,6 +108,7 @@ public class RecipeIngredientsServiceImpl implements RecipeIngredientsService {
             for (RecipeIngredientsDTOcreateItem item: object.getItems()) {
                 RecipeIngredients recipeIngredients = modelMapper.map(item, RecipeIngredients.class);
                 recipeIngredients.setCookingRecipe(cookingRecipe);
+                recipeIngredients.setImg(logoName);
                 recipeIngredientsRepository.save(recipeIngredients);
             }
             return ResponseObject.builder()
@@ -154,13 +156,8 @@ public class RecipeIngredientsServiceImpl implements RecipeIngredientsService {
             if(object == null) {
                 throw new Exception("object not found");
             }
-            try{
-                //delete old img
-                if(!object.getImg().equals("")){
-                    fileStore.deleteImage(object.getImg());
-                }
-            }catch (Exception e){
-                // img is null =>continue
+            if(!object.getImg().equals(logoName)){
+                fileStore.deleteImage(object.getImg());
             }
             //upload new img
             object.setImg(fileStore.uploadImg(file));
@@ -186,12 +183,8 @@ public class RecipeIngredientsServiceImpl implements RecipeIngredientsService {
             if(object == null) {
                 throw new Exception("object not found");
             }
-            try{
-                if(!object.getImg().equals("")){
-                    fileStore.deleteImage(object.getImg());
-                }
-            }catch (Exception e){
-                // img is null =>continue
+            if(!object.getImg().equals(logoName)){
+                fileStore.deleteImage(object.getImg());
             }
 
             recipeIngredientsRepository.delete(object);

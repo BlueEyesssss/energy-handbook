@@ -38,6 +38,8 @@ public class NewsServiceImpl implements NewsService {
     @Value("${aws.s3.link_bucket}")
     private String linkBucket;
 
+    @Value("${logo.energy_handbook.name}")
+    private String logoName;
     @Override
     public ResponseObject<Object> getAll(int pageSize, int pageIndex) {
         Page<News> objListPage = null;
@@ -93,6 +95,7 @@ public class NewsServiceImpl implements NewsService {
             News news = modelMapper.map(object, News.class);
             news.setUpdateDate(new Date(System.currentTimeMillis()));
             news.setEmployee(userSystem);
+            news.setImg(logoName);
             newsRepository.save(news);
             return ResponseObject.builder()
                     .code(200)
@@ -138,13 +141,8 @@ public class NewsServiceImpl implements NewsService {
             if(object == null) {
                 throw new Exception("object not found");
             }
-            try{
-                //delete old img
-                if(!object.getImg().equals("")){
-                    fileStore.deleteImage(object.getImg());
-                }
-            }catch (Exception e){
-                // img is null =>continue
+            if(!object.getImg().equals(logoName)){
+                fileStore.deleteImage(object.getImg());
             }
             //upload new img
             object.setImg(fileStore.uploadImg(file));
@@ -168,14 +166,9 @@ public class NewsServiceImpl implements NewsService {
             if(object == null) {
                 throw new Exception("object not found");
             }
-            try{
-                if(!object.getImg().equals("")){
-                    fileStore.deleteImage(object.getImg());
-                }
-            }catch (Exception e){
-                // img is null =>continue
+            if(!object.getImg().equals(logoName)){
+                fileStore.deleteImage(object.getImg());
             }
-
             newsRepository.delete(object);
             return ResponseObject.builder()
                     .code(200)
