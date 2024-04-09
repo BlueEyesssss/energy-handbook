@@ -1,0 +1,12 @@
+COOKING RECIPE
+    - tạo khung recipe trc (gồm các att trong cooking recipe)
+    - tạo xong thì nhấn vô recipe đó, nó hiện thogn6 tin vừa tạo và có 2 mục là recipe ingredients và food tutorial, mỗi múc có đấu (+) để thêm nội dung cho từng mục
+        -> add thêm các thành phần (recipe ingredients)[tab mới hiện 1 format cho 1 thành phần gồm name + amount + note, có thể tạo thêm nhiều thành phần,
+                                                        ,bấm dấu cộng ra ô tạo tp típ theo]
+            -> sau khi add xong list các thành phần, vào list xem acc1 thành phần, mỗi 1 thành phần sẽ có 1 nút thêm img, 1 nút detail và 1 nút xóa item đó trong list, (nếu mún thêm thành phần thì vẫn có nút add thêm thành phần nha, bấm vào thì như hiện tab mới, thêm 1 hay nhiêu cũng dc9)
+            -> cập nhật img cho từng thành phần
+        -> sau đó add thêm các bước làm (food tutorial)
+            -> sau khi thêm hết các bc làm, vào list để xem hết các bước, mỗi 1 bước sẽ có cập nhật img,1 nút detail và 1 nút xóa item đó trong list giống như trên thành phần (recipe ingredients), có nút thêm bc nếu lỡ thiếu bc luôn nha
+            -> cập nhât từng img cho từng bước
+    -> thế là xong cách tạo cooking recipe
+

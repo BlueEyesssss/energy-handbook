@@ -2,12 +2,10 @@ package com.khaphp.energyhandbook.Service.Impl;
 
 import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Dto.WalletTransaction.WalletTransactionDTOcreate;
-import com.khaphp.energyhandbook.Entity.News;
 import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Entity.WalletTransaction;
 import com.khaphp.energyhandbook.Repository.WalletTransactionRepository;
 import com.khaphp.energyhandbook.Service.UserSystemService;
-import com.khaphp.energyhandbook.Service.WalletService;
 import com.khaphp.energyhandbook.Service.WalletTransactionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
