@@ -1,23 +1,12 @@
-package com.khaphp.energyhandbook.Dto.usersystem;
+package com.khaphp.energyhandbook.Dto.Usersystem;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.khaphp.energyhandbook.Entity.*;
 import com.khaphp.energyhandbook.Util.ValidData.Birthday.ValidBirthday;
 import com.khaphp.energyhandbook.Util.ValidData.Gender.ValidGender;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter

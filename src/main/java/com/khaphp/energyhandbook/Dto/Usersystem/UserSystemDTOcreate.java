@@ -1,10 +1,8 @@
-package com.khaphp.energyhandbook.Dto.usersystem;
+package com.khaphp.energyhandbook.Dto.Usersystem;
 
 import com.khaphp.energyhandbook.Util.ValidData.Birthday.ValidBirthday;
 import com.khaphp.energyhandbook.Util.ValidData.Gender.ValidGender;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 

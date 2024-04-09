@@ -1,4 +1,4 @@
-package com.khaphp.energyhandbook.Dto.usersystem;
+package com.khaphp.energyhandbook.Dto.Usersystem;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -10,8 +10,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class NewPwdParam {
+public class ChangePwdParam {
     private String id;
+    @Size(min = 5, message = "password length must be at least 5 characters")
+    @Size(max = 20, message = "password length must be at most 20 characters")
+    private String password;
     @Size(min = 5, message = "password length must be at least 5 characters")
     @Size(max = 20, message = "password length must be at most 20 characters")
     private String newPassword;

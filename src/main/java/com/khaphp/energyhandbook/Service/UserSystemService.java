@@ -1,7 +1,7 @@
 package com.khaphp.energyhandbook.Service;
 
 import com.khaphp.energyhandbook.Dto.ResponseObject;
-import com.khaphp.energyhandbook.Dto.usersystem.*;
+import com.khaphp.energyhandbook.Dto.Usersystem.*;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserSystemService {

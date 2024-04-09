@@ -1,4 +1,4 @@
-package com.khaphp.energyhandbook.Dto.usersystem;
+package com.khaphp.energyhandbook.Dto.Usersystem;
 
 import com.khaphp.energyhandbook.Util.ValidData.Status.ValidStatus;
 import lombok.AllArgsConstructor;

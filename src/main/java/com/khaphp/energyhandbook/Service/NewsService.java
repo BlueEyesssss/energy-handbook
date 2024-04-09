@@ -3,7 +3,6 @@ package com.khaphp.energyhandbook.Service;
 import com.khaphp.energyhandbook.Dto.News.NewsDTOcreate;
 import com.khaphp.energyhandbook.Dto.News.NewsDTOupdate;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
-import com.khaphp.energyhandbook.Dto.usersystem.*;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface NewsService {

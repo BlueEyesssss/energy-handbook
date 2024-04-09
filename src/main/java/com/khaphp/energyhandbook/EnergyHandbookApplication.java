@@ -3,8 +3,7 @@ package com.khaphp.energyhandbook;
 import com.khaphp.energyhandbook.Constant.Gender;
 import com.khaphp.energyhandbook.Constant.Role;
 import com.khaphp.energyhandbook.Dto.FoodEncylopedia.FoodEncylopediaDTOcreate;
-import com.khaphp.energyhandbook.Dto.ResponseObject;
-import com.khaphp.energyhandbook.Dto.usersystem.UserSystemDTOcreate;
+import com.khaphp.energyhandbook.Dto.Usersystem.UserSystemDTOcreate;
 import com.khaphp.energyhandbook.Entity.FoodEncylopedia;
 import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Repository.FoodEncylopediaRepository;
@@ -21,8 +20,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.UUID;
 

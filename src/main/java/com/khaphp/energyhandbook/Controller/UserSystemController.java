@@ -2,18 +2,12 @@ package com.khaphp.energyhandbook.Controller;
 
 import com.khaphp.energyhandbook.Constant.Role;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
-import com.khaphp.energyhandbook.Dto.usersystem.*;
-import com.khaphp.energyhandbook.Entity.UserSystem;
-import com.khaphp.energyhandbook.Repository.UserSystemRepository;
+import com.khaphp.energyhandbook.Dto.Usersystem.*;
 import com.khaphp.energyhandbook.Service.UserSystemService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

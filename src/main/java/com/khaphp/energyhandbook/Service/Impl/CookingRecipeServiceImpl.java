@@ -1,8 +1,10 @@
 package com.khaphp.energyhandbook.Service.Impl;
 
 import com.khaphp.energyhandbook.Dto.CookingRecipe.CookingRecipeDTOcreate;
+import com.khaphp.energyhandbook.Dto.CookingRecipe.CookingRecipeDTOdetail;
 import com.khaphp.energyhandbook.Dto.CookingRecipe.CookingRecipeDTOupdate;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
+import com.khaphp.energyhandbook.Dto.Usersystem.UserSystemDTOviewInOrtherEntity;
 import com.khaphp.energyhandbook.Entity.CookingRecipe;
 import com.khaphp.energyhandbook.Entity.News;
 import com.khaphp.energyhandbook.Entity.UserSystem;
@@ -81,10 +83,19 @@ public class CookingRecipeServiceImpl implements CookingRecipeService {
                 throw new Exception("object not found");
             }
             object.setProductImg(linkBucket + object.getProductImg());
+            CookingRecipeDTOdetail dto = modelMapper.map(object, CookingRecipeDTOdetail.class);
+            dto.setEmployeeV(UserSystemDTOviewInOrtherEntity.builder()
+                    .id(object.getEmployee().getId())
+                    .name(object.getEmployee().getName())
+                    .imgUrl(object.getEmployee().getImgUrl()).build());
+            dto.setCustomerV(UserSystemDTOviewInOrtherEntity.builder()
+                    .id(object.getCustomer().getId())
+                    .name(object.getCustomer().getName())
+                    .imgUrl(object.getCustomer().getImgUrl()).build());
             return ResponseObject.builder()
                     .code(200)
                     .message("Found")
-                    .data(object)
+                    .data(dto)
                     .build();
         }catch (Exception e){
             return ResponseObject.builder()

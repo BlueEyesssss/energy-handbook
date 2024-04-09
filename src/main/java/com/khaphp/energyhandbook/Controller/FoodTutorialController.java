@@ -1,9 +1,13 @@
 package com.khaphp.energyhandbook.Controller;
 
-import com.khaphp.energyhandbook.Dto.News.NewsDTOcreate;
-import com.khaphp.energyhandbook.Dto.News.NewsDTOupdate;
+import com.khaphp.energyhandbook.Dto.FoodTutorial.FoodTutorialDTOcreate;
+import com.khaphp.energyhandbook.Dto.FoodTutorial.FoodTutorialDTOcreateItem;
+import com.khaphp.energyhandbook.Dto.FoodTutorial.FoodTutorialDTOupdate;
+import com.khaphp.energyhandbook.Dto.RecipeIngredirents.RecipeIngredientsDTOcreate;
+import com.khaphp.energyhandbook.Dto.RecipeIngredirents.RecipeIngredientsDTOupdateItem;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
-import com.khaphp.energyhandbook.Service.NewsService;
+import com.khaphp.energyhandbook.Service.FoodTutorialService;
+import com.khaphp.energyhandbook.Service.RecipeIngredientsService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -12,16 +16,17 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("api/v1/news")
+@RequestMapping("api/v1/food-tutorials")
 //@SecurityRequirement(name = "EnergyHandbook")
-public class NewsController {
+public class FoodTutorialController {
     @Autowired
-    private NewsService newsService;
+    private FoodTutorialService foodTutorialService;
 
     @GetMapping
     public ResponseEntity<?> getAll(@RequestParam(defaultValue = "10") int pageSize,
-                                    @RequestParam(defaultValue = "1") int pageIndex){
-        ResponseObject responseObject = newsService.getAll(pageSize, pageIndex);
+                                    @RequestParam(defaultValue = "1") int pageIndex,
+                                    @RequestParam(defaultValue = "") String cookingRecipeId){
+        ResponseObject responseObject = foodTutorialService.getAll(pageSize, pageIndex, cookingRecipeId);
         if(responseObject.getCode() == 200){
             return ResponseEntity.ok(responseObject);
         }
@@ -29,7 +34,7 @@ public class NewsController {
     }
     @GetMapping("/detail")
     public ResponseEntity<?> getObject(String id){
-        ResponseObject responseObject = newsService.getDetail(id);
+        ResponseObject responseObject = foodTutorialService.getDetail(id);
         if(responseObject.getCode() == 200){
             return ResponseEntity.ok(responseObject);
         }
@@ -37,8 +42,8 @@ public class NewsController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createObject(@RequestBody @Valid NewsDTOcreate object){
-        ResponseObject responseObject = newsService.create(object);
+    public ResponseEntity<?> createObject(@RequestBody @Valid FoodTutorialDTOcreate object){
+        ResponseObject responseObject = foodTutorialService.create(object);
         if(responseObject.getCode() == 200){
             return ResponseEntity.ok(responseObject);
         }
@@ -52,7 +57,7 @@ public class NewsController {
     )
     public ResponseEntity<?> updateImg(@RequestParam("id") String id,
                                        @RequestParam("file") MultipartFile file){
-        ResponseObject responseObject = newsService.updateImage(id, file);
+        ResponseObject responseObject = foodTutorialService.updateImage(id, file);
         if(responseObject.getCode() == 200){
             return ResponseEntity.ok(responseObject);
         }
@@ -60,8 +65,8 @@ public class NewsController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateObject(@RequestBody @Valid NewsDTOupdate object){
-        ResponseObject responseObject = newsService.update(object);
+    public ResponseEntity<?> updateObject(@RequestBody @Valid FoodTutorialDTOupdate object){
+        ResponseObject responseObject = foodTutorialService.update(object);
         if(responseObject.getCode() == 200){
             return ResponseEntity.ok(responseObject);
         }
@@ -70,7 +75,7 @@ public class NewsController {
 
     @DeleteMapping
     public ResponseEntity<?> deleteObject(String id){
-        ResponseObject responseObject = newsService.delete(id);
+        ResponseObject responseObject = foodTutorialService.delete(id);
         if(responseObject.getCode() == 200){
             return ResponseEntity.ok(responseObject);
         }
