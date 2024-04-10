@@ -1,3 +1,6 @@
+
+[![CI with GitHub Actions using Maven | © 2024 by BlueEyesssss](https://github.com/BlueEyesssss/energy-handbook/actions/workflows/build-maven.yml/badge.svg)](https://github.com/BlueEyesssss/energy-handbook/actions/workflows/build-maven.yml)
+
 # Energy Handbook
 *Application help user to caculate BMI, caculate calories/ day, discover cooking recipe, discover calories in food.*
 > Energy Handbook helps you control your energy life
