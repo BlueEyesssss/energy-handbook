@@ -48,12 +48,17 @@ customer (user):
     - có thể tạo công thức nấu ăn của riêng mình:
         + private: chỉ cho 1 mình mình xem
         + public: cho toàn bộ mọi người cùng xem
+    interact:
     - có thể share công thức naấu ăn của mình cho nhiều người khác thông qua xác định username của họ
     - có thể yêu thích công thức nấu ăn nào đó người dùng thấy thích để tiện cho việc xem lại
     - có thể đánh giá sao (vote star) công thức nấu ăn đấy
+    report:
     - có thể báo cáo công thức đấy nếu có đăng sai nội dung (đăng bậy bạ, ko hợp pháp) cho admin xét duyệt
+    comment:
     - có thể viết bình luận vào công thức nấu ăn đó
     - có thể trả lời bình luận nào đó
+    - xóa bình luận:    1/ nếu cmt đó có reply thì ko xóa mà hiện là [ Bình luận này đã đc xóa ]
+                        2/ nếu ko có reply thì xóa luôn
 
     NOTIFICATION
     - xem đc các thông báo của mình (thông báo có người bình luận, thông báo giảm giá, thông báo chúc mừng sinh nhật, ...)

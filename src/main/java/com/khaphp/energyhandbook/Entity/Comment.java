@@ -31,5 +31,9 @@ public class Comment {
 
     @ManyToOne
     @JsonIgnore
-    private UserSystem customer;
+    private UserSystem owner;
+
+    @ManyToOne
+    @JsonIgnore
+    private UserSystem replyTo;
 }

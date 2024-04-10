@@ -74,9 +74,13 @@ public class UserSystem implements UserDetails {
     @JsonIgnore
     private List<CookingRecipe> customerCookingRecipes;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "owner")
     @JsonIgnore
-    private List<Comment> comments;
+    private List<Comment> commentsOwner;
+
+    @OneToMany(mappedBy = "replyTo")
+    @JsonIgnore
+    private List<Comment> commentsReplyTo;
 
     @OneToMany(mappedBy = "customer")
     @JsonIgnore

@@ -1,5 +1,6 @@
 package com.khaphp.energyhandbook;
 
+import com.khaphp.energyhandbook.Constant.EmailDefault;
 import com.khaphp.energyhandbook.Constant.Gender;
 import com.khaphp.energyhandbook.Constant.Role;
 import com.khaphp.energyhandbook.Dto.FoodEncylopedia.FoodEncylopediaDTOcreate;
@@ -59,16 +60,11 @@ public class EnergyHandbookApplication {
 	public CommandLineRunner commandLineRunner(){
 		return args -> {
 			//default account
-			String emailDefaultCustomer = "customer@energy.handbook.com";
-			String emailDefaultEmployee = "employee@energy.handbook.com";
-			String emailDefaultShipper = "shipper@energy.handbook.com";
-			String emailDefaultAdmin = "admin@energy.handbook.com";
-
-			UserSystem userSystem = userRepository.findByEmail(emailDefaultCustomer);
+			UserSystem userSystem = userRepository.findByEmail(EmailDefault.CUSTOMER_EMAIL_DEFAULT);
 			if(userSystem == null){
 				userService.create(UserSystemDTOcreate.builder()
 						.name("Default Customer")
-						.email(emailDefaultCustomer)
+						.email(EmailDefault.CUSTOMER_EMAIL_DEFAULT)
 						.gender(Gender.MALE.toString())
 						.password(UUID.randomUUID().toString())
 						.username("customer")
@@ -76,11 +72,11 @@ public class EnergyHandbookApplication {
 			}
 
 			userSystem = null;
-			userSystem = userRepository.findByEmail(emailDefaultEmployee);
+			userSystem = userRepository.findByEmail(EmailDefault.EMPLOYEE_EMAIL_DEFAULT);
 			if(userSystem == null){
 				userService.create(UserSystemDTOcreate.builder()
 						.name("Default Employee")
-						.email(emailDefaultEmployee)
+						.email(EmailDefault.EMPLOYEE_EMAIL_DEFAULT)
 						.gender(Gender.MALE.toString())
 						.password(UUID.randomUUID().toString())
 						.username("employee")
@@ -88,11 +84,11 @@ public class EnergyHandbookApplication {
 			}
 
 			userSystem = null;
-			userSystem = userRepository.findByEmail(emailDefaultShipper);
+			userSystem = userRepository.findByEmail(EmailDefault.SHIPPER_EMAIL_DEFAULT);
 			if(userSystem == null){
 				userService.create(UserSystemDTOcreate.builder()
 						.name("Default Shipper")
-						.email(emailDefaultShipper)
+						.email(EmailDefault.SHIPPER_EMAIL_DEFAULT)
 						.gender(Gender.MALE.toString())
 						.password(UUID.randomUUID().toString())
 						.username("shipper")
@@ -100,11 +96,11 @@ public class EnergyHandbookApplication {
 			}
 
 			userSystem = null;
-			userSystem = userRepository.findByEmail(emailDefaultAdmin);
+			userSystem = userRepository.findByEmail(EmailDefault.ADMIN_EMAIL_DEFAULT);
 			if(userSystem == null){
 				userService.create(UserSystemDTOcreate.builder()
 						.name("Admintrator")
-						.email(emailDefaultAdmin)
+						.email(EmailDefault.ADMIN_EMAIL_DEFAULT)
 						.gender(Gender.MALE.toString())
 						.password("11111")
 						.username("admin")
@@ -112,7 +108,7 @@ public class EnergyHandbookApplication {
 			}
 
 			//default food encylopedia
-			UserSystem employee = userRepository.findByEmail(emailDefaultEmployee);
+			UserSystem employee = userRepository.findByEmail(EmailDefault.EMPLOYEE_EMAIL_DEFAULT);
 			FoodEncylopedia foodEncylopedia = foodEncylopediaRepository.findByName("...");
 			if(foodEncylopedia == null){
 				foodEncylopediaService.create(FoodEncylopediaDTOcreate.builder()

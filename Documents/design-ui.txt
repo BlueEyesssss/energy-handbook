@@ -10,3 +10,11 @@ COOKING RECIPE
             -> cập nhât từng img cho từng bước
     -> thế là xong cách tạo cooking recipe
 
+COMMENT IN COOKING RECIPE
+    cooking recipe: Gà Hầm thuốc bắc (của H)
+    comment:     - A: công thức này hay ghê mom, nhưng mình có thể thay thế loại thuốc bắc ko               (1)
+    child cmt:      H > A: được nha mom ơi, thuốc bắc là tùy mình                                           (2)
+                    C > A: mình có thử 1 vài loại khác nhưng nó không ngon bằng công thức chủa chị này      (3)
+                    A > H: oke mom                                                                          (4)
+                    A > C: vậy hả @@, chắc để mình thử xem, biết đâu khẩu vị mỗi ng mỗi khác                (5)
+    - mỗi dòng cmt điều có nút nhỏ [reply], reply dòng nào thì tức là đang reply với owner của cmt đó

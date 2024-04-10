@@ -87,11 +87,11 @@ public class CookingRecipeServiceImpl implements CookingRecipeService {
             dto.setEmployeeV(UserSystemDTOviewInOrtherEntity.builder()
                     .id(object.getEmployee().getId())
                     .name(object.getEmployee().getName())
-                    .imgUrl(object.getEmployee().getImgUrl()).build());
+                    .imgUrl(linkBucket + object.getEmployee().getImgUrl()).build());
             dto.setCustomerV(UserSystemDTOviewInOrtherEntity.builder()
                     .id(object.getCustomer().getId())
                     .name(object.getCustomer().getName())
-                    .imgUrl(object.getCustomer().getImgUrl()).build());
+                    .imgUrl(linkBucket + object.getCustomer().getImgUrl()).build());
             return ResponseObject.builder()
                     .code(200)
                     .message("Found")
