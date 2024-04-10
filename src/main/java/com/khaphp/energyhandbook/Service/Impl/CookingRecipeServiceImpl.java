@@ -1,5 +1,6 @@
 package com.khaphp.energyhandbook.Service.Impl;
 
+import com.khaphp.energyhandbook.Constant.StatusCookingRecipe;
 import com.khaphp.energyhandbook.Dto.CookingRecipe.CookingRecipeDTOcreate;
 import com.khaphp.energyhandbook.Dto.CookingRecipe.CookingRecipeDTOdetail;
 import com.khaphp.energyhandbook.Dto.CookingRecipe.CookingRecipeDTOupdate;
@@ -55,9 +56,9 @@ public class CookingRecipeServiceImpl implements CookingRecipeService {
         //paging
         if(pageSize > 0 && pageIndex > 0){
             if(customerId.equals("")){  //lấy hết
-                objListPage = cookingRecipeRepository.findAll(PageRequest.of(pageIndex - 1, pageSize));  //vì current page ở code nó start = 0, hay bên ngoài la 2pga đầu tiên hay 1
+                objListPage = cookingRecipeRepository.findByStatus(StatusCookingRecipe.PUBLIC.toString(), PageRequest.of(pageIndex - 1, pageSize));  //vì current page ở code nó start = 0, hay bên ngoài la 2pga đầu tiên hay 1
             }else{ //có filter theo customer
-                objListPage = cookingRecipeRepository.findByCustomerId(customerId, PageRequest.of(pageIndex - 1, pageSize));
+                objListPage = cookingRecipeRepository.findByCustomerIdAndStatus(customerId, StatusCookingRecipe.PUBLIC.toString(), PageRequest.of(pageIndex - 1, pageSize));
             }
             if(objListPage != null){
                 totalPage = objListPage.getTotalPages();

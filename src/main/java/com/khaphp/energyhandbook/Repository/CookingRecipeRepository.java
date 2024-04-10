@@ -11,5 +11,7 @@ import java.util.List;
 
 @Repository
 public interface CookingRecipeRepository extends JpaRepository<CookingRecipe, String> {
-    Page<CookingRecipe> findByCustomerId(String customerId, PageRequest pageRequest);
+    Page<CookingRecipe> findByCustomerIdAndStatus(String customerId, String status, PageRequest pageRequest);
+
+    Page<CookingRecipe> findByStatus(String status, PageRequest pageRequest);
 }
