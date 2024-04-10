@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: CI with GitHub Actions using Maven | © 2024 by BlueEyesssss
 
 on:
   push:
