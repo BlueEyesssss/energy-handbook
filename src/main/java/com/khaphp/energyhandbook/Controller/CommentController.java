@@ -40,6 +40,7 @@ public class CommentController {
     }
 
     @PostMapping
+    @Operation(description = "owner là người viết cmt đó nha")
     public ResponseEntity<?> createObject(@RequestBody @Valid CommentDTOcreate object){
         ResponseObject responseObject = commentService.create(object);
         if(responseObject.getCode() == 200){

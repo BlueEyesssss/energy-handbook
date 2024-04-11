@@ -1,7 +1,6 @@
 package com.khaphp.energyhandbook.Dto.CookingRecipe;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.khaphp.energyhandbook.Dto.Usersystem.UserSystemDTOviewInOrtherEntity;
 import com.khaphp.energyhandbook.Entity.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CookingRecipeDTOdetail {
+public class CookingRecipeDTOview {
     private String id;
     private String name;
     private String productImg;
@@ -31,20 +30,4 @@ public class CookingRecipeDTOdetail {
     private int like;
     private float star;
     private int vote;
-
-    private UserSystemDTOviewInOrtherEntity employeeV;
-
-    private UserSystemDTOviewInOrtherEntity customerV;
-
-    private List<RecipeIngredients> recipeIngredients;
-
-    private List<FoodTutorial> foodTutorials;
-
-//    @OneToMany(mappedBy = "cookingRecipe")
-//    @JsonIgnore
-//    private List<Comment> comments;
-//
-//    @OneToMany(mappedBy = "cookingRecipe")
-//    @JsonIgnore
-//    private List<Interact> interacts;
 }

@@ -4,6 +4,7 @@ import com.khaphp.energyhandbook.Constant.StatusCookingRecipe;
 import com.khaphp.energyhandbook.Dto.CookingRecipe.CookingRecipeDTOcreate;
 import com.khaphp.energyhandbook.Dto.CookingRecipe.CookingRecipeDTOdetail;
 import com.khaphp.energyhandbook.Dto.CookingRecipe.CookingRecipeDTOupdate;
+import com.khaphp.energyhandbook.Dto.CookingRecipe.CookingRecipeDTOview;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Dto.Usersystem.UserSystemDTOviewInOrtherEntity;
 import com.khaphp.energyhandbook.Entity.CookingRecipe;
@@ -11,6 +12,7 @@ import com.khaphp.energyhandbook.Entity.News;
 import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Repository.CookingRecipeRepository;
 import com.khaphp.energyhandbook.Repository.UserSystemRepository;
+import com.khaphp.energyhandbook.Repository.VotesRepository;
 import com.khaphp.energyhandbook.Service.CookingRecipeService;
 import com.khaphp.energyhandbook.Service.FileStore;
 import com.khaphp.energyhandbook.Service.UserSystemService;
@@ -22,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +33,9 @@ public class CookingRecipeServiceImpl implements CookingRecipeService {
     public static final String DEFAULT_EMPLOYEE_MAIL = "employee@energy.handbook.com";
     @Autowired
     private CookingRecipeRepository cookingRecipeRepository;
+
+    @Autowired
+    private VotesRepository votesRepository;
 
     @Autowired
     private UserSystemRepository userSystemRepository;
@@ -52,6 +58,7 @@ public class CookingRecipeServiceImpl implements CookingRecipeService {
     public ResponseObject<Object> getAll(int pageSize, int pageIndex, String customerId) {
         Page<CookingRecipe> objListPage = null;
         List<CookingRecipe> objList = null;
+        List<CookingRecipeDTOview> objListV = null;
         int totalPage = 0;
         //paging
         if(pageSize > 0 && pageIndex > 0){
@@ -68,11 +75,20 @@ public class CookingRecipeServiceImpl implements CookingRecipeService {
             objList = cookingRecipeRepository.findAll();
             pageIndex = 1;
         }
-        objList.forEach(object -> object.setProductImg(linkBucket + object.getProductImg()));
+        objListV = new ArrayList<>();
+        for(CookingRecipe x : objList){
+            CookingRecipeDTOview dto = modelMapper.map(x, CookingRecipeDTOview.class);
+            dto.setCmtSize(x.getComments().size());
+            dto.setLike(x.getUserLikes().size());
+            dto.setStar(votesRepository.averageVoteStar(x.getId()));
+            dto.setVote(x.getVotes().size());
+            dto.setProductImg(linkBucket + x.getProductImg());
+            objListV.add(dto);
+        }
         return ResponseObject.builder()
                 .code(200).message("Success")
-                .pageSize(objList.size()).pageIndex(pageIndex).totalPage(totalPage)
-                .data(objList)
+                .pageSize(objListV.size()).pageIndex(pageIndex).totalPage(totalPage)
+                .data(objListV)
                 .build();
     }
 
@@ -93,6 +109,10 @@ public class CookingRecipeServiceImpl implements CookingRecipeService {
                     .id(object.getCustomer().getId())
                     .name(object.getCustomer().getName())
                     .imgUrl(linkBucket + object.getCustomer().getImgUrl()).build());
+            dto.setCmtSize(object.getComments().size());
+            dto.setLike(object.getUserLikes().size());
+            dto.setStar(votesRepository.averageVoteStar(id));
+            dto.setVote(object.getVotes().size());
             return ResponseObject.builder()
                     .code(200)
                     .message("Found")

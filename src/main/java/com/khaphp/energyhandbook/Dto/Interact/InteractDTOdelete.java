@@ -12,11 +12,10 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class InteractDTOcreate {
+public class InteractDTOdelete {
     private String customerId;
+    private String ownerId;
     private String cookingRecipeId;
     @ValidTypeInteract
     private String typeInteract;
-    private int star;
-    private List<String> gmails;
 }

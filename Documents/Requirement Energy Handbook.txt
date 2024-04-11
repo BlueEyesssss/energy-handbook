@@ -49,7 +49,7 @@ customer (user):
         + private: chỉ cho 1 mình mình xem
         + public: cho toàn bộ mọi người cùng xem
     interact:
-    - có thể share công thức naấu ăn của mình cho nhiều người khác thông qua xác định username của họ
+    - có thể share công thức naấu ăn của mình cho nhiều người khác thông qua xác định gmail của họ
     - có thể yêu thích công thức nấu ăn nào đó người dùng thấy thích để tiện cho việc xem lại
     - có thể đánh giá sao (vote star) công thức nấu ăn đấy
     report:
