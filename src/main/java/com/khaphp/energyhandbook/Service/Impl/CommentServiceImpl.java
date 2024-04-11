@@ -83,7 +83,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ResponseObject<Object> getChildComment(String id) {
+    public ResponseObject<Object> getChildComment(String id, int pageSize, int pageIndex) {
         try{
             Comment object = commentRepository.findById(id).orElse(null);
             if(object == null) {
@@ -91,7 +91,7 @@ public class CommentServiceImpl implements CommentService {
             }
             CommentDTOviewDetail objectView = modelMapper.map(object, CommentDTOviewDetail.class);
 
-            Page<Comment> listChildPage = commentRepository.findAllByCookingRecipeIdAndParentCommentIdOrderByCreateDate(object.getCookingRecipe().getId(), object.getId(), PageRequest.of(0, 5));
+            Page<Comment> listChildPage = commentRepository.findAllByCookingRecipeIdAndParentCommentIdOrderByCreateDate(object.getCookingRecipe().getId(), object.getId(), PageRequest.of(0, pageSize * pageIndex));
             int pagesize = 0;
             if(listChildPage.getTotalElements() > 0){
                 List<Comment> listChild = listChildPage.getContent();
