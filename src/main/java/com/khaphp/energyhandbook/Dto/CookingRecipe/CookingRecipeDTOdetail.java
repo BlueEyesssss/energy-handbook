@@ -27,6 +27,10 @@ public class CookingRecipeDTOdetail {
     private short mealServing;
     private String description;
     private String status;
+    private int cmtSize;
+    private int like;
+    private int star;
+    private int vote;
 
     private UserSystemDTOviewInOrtherEntity employeeV;
 

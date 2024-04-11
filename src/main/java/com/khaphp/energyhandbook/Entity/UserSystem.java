@@ -38,9 +38,29 @@ public class UserSystem implements UserDetails {
     private String role;
     private boolean premium;
 
+    @ManyToMany(mappedBy = "userLikes")
+    @JsonIgnore
+    private List<CookingRecipe> likedCookingRecipes;
+
+//    @ManyToMany(mappedBy = "userVotes")
+//    @JsonIgnore
+//    private List<CookingRecipe> votedCookingRecipes;
+
+    @ManyToMany(mappedBy = "userReports")
+    @JsonIgnore
+    private List<CookingRecipe> reportedCookingRecipes;
+
+    @ManyToMany(mappedBy = "userShares")
+    @JsonIgnore
+    private List<CookingRecipe> sharedCookingRecipes;
+
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Notification> notifications;
+
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnore
+    private List<Votes> votes;
 
     @OneToMany(mappedBy = "employee")
     @JsonIgnore
@@ -81,10 +101,6 @@ public class UserSystem implements UserDetails {
     @OneToMany(mappedBy = "replyTo")
     @JsonIgnore
     private List<Comment> commentsReplyTo;
-
-    @OneToMany(mappedBy = "customer")
-    @JsonIgnore
-    private List<Interact> interacts;
 
     @OneToMany(mappedBy = "employee")
     @JsonIgnore

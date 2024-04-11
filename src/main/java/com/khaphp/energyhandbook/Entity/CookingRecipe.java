@@ -53,5 +53,41 @@ public class CookingRecipe {
 
     @OneToMany(mappedBy = "cookingRecipe")
     @JsonIgnore
-    private List<Interact> interacts;
+    private List<Votes> votes;
+
+    @ManyToMany
+    @JoinTable(
+        name = "likes",
+        joinColumns = @JoinColumn(name = "cooking_recipe_id"),
+        inverseJoinColumns = @JoinColumn(name = "customer_id")
+    )
+    @JsonIgnore
+    private List<UserSystem> userLikes;
+
+//    @ManyToMany
+//    @JoinTable(
+//            name = "votes",
+//            joinColumns = @JoinColumn(name = "cooking_recipe_id"),
+//            inverseJoinColumns = @JoinColumn(name = "customer_id")
+//    )
+//    @JsonIgnore
+//    private List<UserSystem> userVotes;
+
+    @ManyToMany
+    @JoinTable(
+        name = "reports",
+        joinColumns = @JoinColumn(name = "cooking_recipe_id"),
+        inverseJoinColumns = @JoinColumn(name = "customer_id")
+    )
+    @JsonIgnore
+    private List<UserSystem> userReports;
+
+    @ManyToMany
+    @JoinTable(
+            name = "shares",
+            joinColumns = @JoinColumn(name = "cooking_recipe_id"),
+            inverseJoinColumns = @JoinColumn(name = "customer_id")
+    )
+    @JsonIgnore
+    private List<UserSystem> userShares;
 }
