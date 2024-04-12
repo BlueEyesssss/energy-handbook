@@ -1,10 +1,7 @@
 package com.khaphp.energyhandbook.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +23,7 @@ public class PaymentOrder {
     private String address;
     private String method;
 
-    @ManyToOne
+    @OneToOne
     @JsonIgnore
     private Order order;
 }

@@ -14,6 +14,7 @@ import com.khaphp.energyhandbook.Util.VnPayHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
@@ -35,6 +36,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private WalletTransactionService walletTransactionService;
+
+    @Value("${aws.s3.link_bucket}")
+    private String linkBucket;
     @Override
     public ResponseObject<?> createPayment(HttpServletRequest req, int amount_param, String customerId, UserSystemService userSystemService) {
         try {
@@ -43,6 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
             if (userSystem == null || !userSystem.getRole().equals(Role.CUSTOMER)) {
                 throw new Exception("User not found");
             }
+            userSystem.setImgUrl(userSystem.getImgUrl().substring(linkBucket.length()));
 
             //create param for vnpay-url required
             String vnp_Version = "2.1.0";
@@ -162,6 +167,7 @@ public class PaymentServiceImpl implements PaymentService {
                     int tmp = vnp_OrderInfo.lastIndexOf(":");
                     String idCus = vnp_OrderInfo.substring(tmp + 1).trim();
                     UserSystem userSystem = (UserSystem) userSystemService.getDetail(idCus).getData();
+                    userSystem.setImgUrl(userSystem.getImgUrl().substring(linkBucket.length()));
                     if (userSystem != null) {
                         //cập nhật ví
                         ResponseObject rs = walletService.updateBalance(WalletDTOupdate.builder()

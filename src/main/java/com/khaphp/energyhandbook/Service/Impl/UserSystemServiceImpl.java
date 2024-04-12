@@ -1,5 +1,6 @@
 package com.khaphp.energyhandbook.Service.Impl;
 
+import com.khaphp.energyhandbook.Constant.Role;
 import com.khaphp.energyhandbook.Constant.Status;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Dto.Wallet.WalletDTOcreate;
@@ -134,8 +135,10 @@ public class UserSystemServiceImpl implements UserSystemService {
             userSystem.setImgUrl(logoName);
             userSystem = userRepository.save(userSystem);
 
-            //create wallet
-            walletService.create(WalletDTOcreate.builder().customerId(userSystem.getId()).build(), this);
+            //create wallet for customer
+            if(role.equals(Role.CUSTOMER.toString())){
+                walletService.create(WalletDTOcreate.builder().customerId(userSystem.getId()).build(), this);
+            }
 
             return ResponseObject.builder()
                     .code(200)

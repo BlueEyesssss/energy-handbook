@@ -44,7 +44,7 @@ public class Order {
     @JsonIgnore
     private List<OrderDetail> orderDetails;
 
-    @OneToMany(mappedBy = "order")
+    @OneToOne(mappedBy = "order")
     @JsonIgnore
-    private List<PaymentOrder> paymentOrders;
+    private PaymentOrder paymentOrder;
 }

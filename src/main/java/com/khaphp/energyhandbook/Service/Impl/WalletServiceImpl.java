@@ -11,6 +11,7 @@ import com.khaphp.energyhandbook.Service.UserSystemService;
 import com.khaphp.energyhandbook.Service.WalletService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +22,8 @@ public class WalletServiceImpl implements WalletService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Value("${aws.s3.link_bucket}")
+    private String linkBucket;
     @Override
     public ResponseObject<Object> getDerail(String customerId, UserSystemService userSystemService) {
         try {
@@ -68,6 +71,7 @@ public class WalletServiceImpl implements WalletService {
             if(customer == null || !customer.getRole().equals(Role.CUSTOMER)){
                 throw new Exception("customer not found");
             }
+            customer.setImgUrl(customer.getImgUrl().substring(linkBucket.length()));
             customer.getWallet().setBalance(customer.getWallet().getBalance() + object.getBalance());
             walletRepository.save(customer.getWallet());
             return ResponseObject.builder()

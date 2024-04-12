@@ -79,6 +79,8 @@ customer (user):
         + admin sẽ gọi để xác nhận đơn hàng, sau đó thàng công thì cập nhật trang thái đơn hàng là chở giao [ACCEPT], nếu ko thành công hay có chuyện gì đó thì [REJECT]
         + khi shiper bắt đầu giao hàng thi họ sẽ chuyển trạng thái đơn hàng thành [WAITING]
         + khi giao và thanh toán thành công thì sẽ đơn hàng thành [FINISH]
+    - khi đã đặt hàng thì ko thể sửa lại nội dung trong đơn hàng đó
+    - hủy đơn hàng trước khi nó chuyển trạng trạng thái ACCEPT (tức là đơn đã đc chấp nhận, đang chở giao hàng thôi)
     - xem đc các đơn hàng (bao gồm lịch sử)
     - xem đc chi tiết đơn hàng đó:
         - thời gian đặt hàng

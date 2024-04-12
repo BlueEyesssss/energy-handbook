@@ -9,6 +9,7 @@ import com.khaphp.energyhandbook.Service.UserSystemService;
 import com.khaphp.energyhandbook.Service.WalletTransactionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ public class WalletTransactionServiceImpl implements WalletTransactionService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Value("${aws.s3.link_bucket}")
+    private String linkBucket;
     @Override
     public ResponseObject<Object> getAll(int pageSize, int pageIndex) {
         Page<WalletTransaction> objListPage = null;
@@ -80,6 +84,7 @@ public class WalletTransactionServiceImpl implements WalletTransactionService {
             if(userSystem == null){
                 throw new Exception("user not found");
             }
+            userSystem.setImgUrl(userSystem.getImgUrl().substring(linkBucket.length()));
             WalletTransaction walletTransaction = modelMapper.map(object, WalletTransaction.class);
 //            walletTransaction.setCreateDate(new Date(System.currentTimeMillis()));
             walletTransaction.setWallet(userSystem.getWallet());
