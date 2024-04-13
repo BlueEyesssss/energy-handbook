@@ -43,6 +43,8 @@ public class OrdersController {
     }
 
     @PostMapping
+    @Operation(summary = "COD (guest, cus), WALLET (GUEST)",
+    description = "nếu guest thì khỏi truyền customerId, còn nếu cus thìkho3oi3 truyền name, phone, address guest về")
     public ResponseEntity<?> createObject(@RequestBody @Valid OrderDTOcreate object) throws Exception {
         try{
             ResponseObject responseObject = ordersService.create(object);

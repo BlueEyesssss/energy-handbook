@@ -24,7 +24,7 @@ public class OrderDTOcreate {
     @ValidMethod
     private String method;
     //--guest payment
-//    private String phoneGuest;
-//    private String nameGuest;
-//    private String address;
+    private String phoneGuest;
+    private String nameGuest;
+    private String address;
 }

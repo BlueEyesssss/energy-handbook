@@ -1,9 +1,11 @@
 ORDER:
   payment method:
     COD: employee xác nhận -> chuyển trạng thái (PENDING -> ACCEPT) -> đợi shipper nhậnđể giao (ACCEPT -> WAITING) -> giao * thanh toán tiền xong, shipper đổi trạng thái đơn hàng (WAITING -> FINISH)
+        - đối vs Guest: giống như customer, có thề COD, quy trình y cus thôi
     WALLET: đơn hàng default là đã ACCEPT vì (khi mua hàng nó sẽ check số tiền trong ví app, nếu đủ thì nó từ tiền, ko đủ thì ko cho thanh toán thôi)
-    THIRDPARTY: dành cho các service bên thứ 3 (vd: gọi vn pay thanh toán trên ví VNPAY), lcu1 này tạo link thanh toán vnpay và cho số tiền tổng order cần thành toán vào link, customer sẽ thanh toán trên VNPAy nếu success thì gọi api tạo order, đơn sẽ đc tạo thành và có status ACCEPT, còn ko thì báo fail
-
+    THIRDPARTY: dành cho các service bên thứ 3 (vd: gọi vn pay thanh toán trên ví VNPAY):
+        - cus: truyền về param để tạo order + param nạp tiền -> tạo order trc, cho nó status là PENDING -> lấy mã order làm nội dung gioa dịch khi gọi vn pay -> giao dịch xong trả về thì lấy mã order ra để đổi status của order đó thành ACCEPT
+        - guest: y như vậy nhưng nó truyền về info guest thôi (name, phone, address)
   status:
     PENDING: đơn hàng đc tạo và đang chờ employee xác nhận
     ACCEPT: đơn hàng d94 đc xác nhận, đang chờ giao hàng

@@ -132,11 +132,17 @@ public class OrdersServiceImpl implements OrdersService {
     @Transactional(rollbackFor = Exception.class)
     public ResponseObject<Object> create(OrderDTOcreate object) throws Exception {
         try{
-            UserSystem userSystem = (UserSystem) userSystemService.getDetail(object.getCustomerId()).getData();
+            UserSystem userSystem = null;
+            if(object.getPhoneGuest() != null){
+                //guest order COD
+                userSystem = userSystemRepository.findByEmail(EmailDefault.CUSTOMER_EMAIL_DEFAULT);
+            }else{
+                //user order
+                userSystem =  userSystemRepository.findById(object.getCustomerId()).orElse(null);
+            }
             if(userSystem == null){
                 throw new Exception("user not found");
             }
-            userSystem.setImgUrl(userSystem.getImgUrl().substring(linkBucket.length()));
 
             //create order trc
             Order order = new Order();
@@ -145,7 +151,8 @@ public class OrdersServiceImpl implements OrdersService {
             order.setEmployee(userSystemRepository.findByEmail(EmailDefault.EMPLOYEE_EMAIL_DEFAULT));
             order.setShipper(userSystemRepository.findByEmail(EmailDefault.SHIPPER_EMAIL_DEFAULT));
             int totalPrice = 0;
-            if(object.getMethod().equals(Method.COD.toString())){   //vì COD mới cần check duyệt, còn 2 cái kia là thanh toán đơn luôn rồi
+            if(     object.getMethod().equals(Method.COD.toString()) ||
+                    object.getMethod().equals(Method.THIRDPARTY.toString())){   //vì COD, THIRDPARTY mới cần check duyệt, còn cái kia là thanh toán đơn luôn rồi
                 order.setStatus(StatusOrder.PENDING.toString());
             }else{
                 order.setStatus(StatusOrder.ACCEPT.toString());
@@ -154,7 +161,7 @@ public class OrdersServiceImpl implements OrdersService {
             order.setDeliveryTime(null);
             order = ordersRepository.save(order);
 
-            if(!object.getMethod().equals(Method.THIRDPARTY.toString())){
+            if(object.getMethod().equals(Method.WALLET.toString())){    //nếu là wallet thì check balance để trừ tiền
                 //tính totalprice trước để check tiền trừ
                 for (OrderDetailDTOcreate orderDetailDTOcreate : object.getOrderDetails()) {
                     totalPrice += orderDetailDTOcreate.getPrice() * orderDetailDTOcreate.getAmount();
@@ -206,6 +213,11 @@ public class OrdersServiceImpl implements OrdersService {
             PaymentOrder paymentOrder = new PaymentOrder();
             paymentOrder.setOrder(order);
             paymentOrder.setMethod(object.getMethod());
+            if(object.getPhoneGuest() != null){
+                paymentOrder.setNameGuest(object.getNameGuest());
+                paymentOrder.setPhoneGuest(object.getPhoneGuest());
+                paymentOrder.setAddress(object.getAddress());
+            }
             paymentOrderRepository.save(paymentOrder);
 
             return ResponseObject.builder()
