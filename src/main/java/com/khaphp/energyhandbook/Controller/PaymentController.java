@@ -30,7 +30,7 @@ public class PaymentController {
     public ResponseEntity<?> getAll(HttpServletRequest req,
                                     @RequestParam @Min(10000) int amount,
                                     @RequestParam String customerId){
-        ResponseObject responseObject = paymentService.createPayment(req, amount, customerId, userSystemService);
+        ResponseObject responseObject = paymentService.createPayment(req, amount, customerId, userSystemService, false, "");
         if(responseObject.getCode() == 200){
             return ResponseEntity.ok(responseObject);
         }

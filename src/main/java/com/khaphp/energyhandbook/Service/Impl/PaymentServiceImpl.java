@@ -1,15 +1,15 @@
 package com.khaphp.energyhandbook.Service.Impl;
 
 import com.khaphp.energyhandbook.Constant.Role;
+import com.khaphp.energyhandbook.Constant.StatusOrder;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Dto.Wallet.WalletDTOupdate;
 import com.khaphp.energyhandbook.Dto.WalletTransaction.WalletTransactionDTOcreate;
+import com.khaphp.energyhandbook.Entity.Order;
 import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Entity.WalletTransaction;
-import com.khaphp.energyhandbook.Service.PaymentService;
-import com.khaphp.energyhandbook.Service.UserSystemService;
-import com.khaphp.energyhandbook.Service.WalletService;
-import com.khaphp.energyhandbook.Service.WalletTransactionService;
+import com.khaphp.energyhandbook.Repository.OrdersRepository;
+import com.khaphp.energyhandbook.Service.*;
 import com.khaphp.energyhandbook.Util.VnPayHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -37,10 +37,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private WalletTransactionService walletTransactionService;
 
+    @Autowired
+    private OrdersRepository ordersRepository;
+
     @Value("${aws.s3.link_bucket}")
     private String linkBucket;
     @Override
-    public ResponseObject<?> createPayment(HttpServletRequest req, int amount_param, String customerId, UserSystemService userSystemService) {
+    public ResponseObject<?> createPayment(HttpServletRequest req, int amount_param, String customerId, UserSystemService userSystemService, boolean isThirdParty, String orderId) {
         try {
             //check id customer
             UserSystem userSystem = (UserSystem) userSystemService.getDetail(customerId).getData();
@@ -72,7 +75,11 @@ public class PaymentServiceImpl implements PaymentService {
 //            vnp_Params.put("vnp_BankCode", bankCode);     //còn nếu mú chỉ định thì cứ ghi ngân hàng đó ra, chữ in hoa, vd: NCB, VIETCOMBANK, ..
 //        }
             vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-            vnp_Params.put("vnp_OrderInfo", "Nap tien vao vi Energy Handbook: " + vnp_TxnRef + " cua UserID: " + customerId);   //chữ ko dấu nha
+            if(isThirdParty){
+                vnp_Params.put("vnp_OrderInfo", "3party "+orderId+": " + vnp_TxnRef + " cua UserID: " + customerId);
+            }else{
+                vnp_Params.put("vnp_OrderInfo", "Nap tien vao vi Energy Handbook: " + vnp_TxnRef + " cua UserID: " + customerId);   //chữ ko dấu nha
+            }
             vnp_Params.put("vnp_OrderType", orderType);
 
 //        String locate = req.getParameter("language");
@@ -135,6 +142,10 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
+    public static void main(String[] args) {
+        String info = "3party 9483or39r3r4fdfdf2wr4c2: 32987430 cua UserID: 9437h-r49i7hf4-fkuhf387fdwu";
+        System.out.println(info.substring("3party ".length(), info.indexOf(':')));
+    }
     /*
     * http://localhost:8080/api/payment/payment_result
     ?vnp_Amount=1000000
@@ -159,8 +170,16 @@ public class PaymentServiceImpl implements PaymentService {
                 log.info("payment from VNpay success");
                 //payment success
                 //check order info xem là customer hay guest booking
-                if(vnp_OrderInfo.contains("guestbooking:")){
-                    log.info("guest booking : " + vnp_OrderInfo);
+                String sign3party = "3party ";
+                if(vnp_OrderInfo.contains(sign3party)){
+                    log.info("order third party: " + vnp_OrderInfo);
+                    Order order = ordersRepository.findById(vnp_OrderInfo.substring(sign3party.length(), vnp_OrderInfo.indexOf(':'))).orElse(null);
+                    if(order == null){
+                        throw new Exception("order not found");
+                    }
+                    order.setStatus(StatusOrder.ACCEPT.toString());
+                    ordersRepository.save(order);
+
                 }else{ //customer
                     log.info("customer payment : " + vnp_OrderInfo);
                     //khúc này có thể lưu DB or tăng số tiền đã nạp vào ví

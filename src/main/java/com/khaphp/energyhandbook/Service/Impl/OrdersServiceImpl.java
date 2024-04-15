@@ -14,19 +14,24 @@ import com.khaphp.energyhandbook.Dto.Usersystem.UserSystemDTOviewInOrtherEntity;
 import com.khaphp.energyhandbook.Dto.WalletTransaction.WalletTransactionDTOcreate;
 import com.khaphp.energyhandbook.Entity.*;
 import com.khaphp.energyhandbook.Entity.keys.OrderDetailKey;
-import com.khaphp.energyhandbook.OrderDetailDTOcreate;
+import com.khaphp.energyhandbook.Dto.OrderDetail.OrderDetailDTOcreate;
 import com.khaphp.energyhandbook.Repository.*;
-import com.khaphp.energyhandbook.Service.FileStore;
 import com.khaphp.energyhandbook.Service.OrdersService;
+import com.khaphp.energyhandbook.Service.PaymentService;
 import com.khaphp.energyhandbook.Service.UserSystemService;
 import com.khaphp.energyhandbook.Service.WalletTransactionService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,6 +52,9 @@ public class OrdersServiceImpl implements OrdersService {
     private PaymentOrderRepository paymentOrderRepository;
 
     @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
     private UserSystemService userSystemService;
 
     @Autowired
@@ -57,6 +65,9 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Value("${aws.s3.link_bucket}")
     private String linkBucket;
@@ -132,93 +143,27 @@ public class OrdersServiceImpl implements OrdersService {
     @Transactional(rollbackFor = Exception.class)
     public ResponseObject<Object> create(OrderDTOcreate object) throws Exception {
         try{
-            UserSystem userSystem = null;
-            if(object.getPhoneGuest() != null){
-                //guest order COD
-                userSystem = userSystemRepository.findByEmail(EmailDefault.CUSTOMER_EMAIL_DEFAULT);
-            }else{
-                //user order
-                userSystem =  userSystemRepository.findById(object.getCustomerId()).orElse(null);
-            }
-            if(userSystem == null){
-                throw new Exception("user not found");
-            }
+            //check user
+            UserSystem userSystem = validateUserInOrder(object);
 
             //create order trc
-            Order order = new Order();
-            order.setCreateDate(new Date(System.currentTimeMillis()));
-            order.setCustomer(userSystem);
-            order.setEmployee(userSystemRepository.findByEmail(EmailDefault.EMPLOYEE_EMAIL_DEFAULT));
-            order.setShipper(userSystemRepository.findByEmail(EmailDefault.SHIPPER_EMAIL_DEFAULT));
-            int totalPrice = 0;
-            if(     object.getMethod().equals(Method.COD.toString()) ||
-                    object.getMethod().equals(Method.THIRDPARTY.toString())){   //vì COD, THIRDPARTY mới cần check duyệt, còn cái kia là thanh toán đơn luôn rồi
-                order.setStatus(StatusOrder.PENDING.toString());
-            }else{
-                order.setStatus(StatusOrder.ACCEPT.toString());
-            }
-            order.setUpdateDate(null);
-            order.setDeliveryTime(null);
+            Order order = createOrder(userSystem, object);
             order = ordersRepository.save(order);
 
-            if(object.getMethod().equals(Method.WALLET.toString())){    //nếu là wallet thì check balance để trừ tiền
-                //tính totalprice trước để check tiền trừ
-                for (OrderDetailDTOcreate orderDetailDTOcreate : object.getOrderDetails()) {
-                    totalPrice += orderDetailDTOcreate.getPrice() * orderDetailDTOcreate.getAmount();
-                }
-                if(userSystem.getWallet().getBalance() < totalPrice){
-                    throw new Exception("balance not enough");
-                }else{
-                    //thanh toán tiền
-                    userSystem.getWallet().setBalance(userSystem.getWallet().getBalance() - totalPrice);
-                    userSystemRepository.save(userSystem);
-
-                    //create wallet transaction luôn
-                    ResponseObject rs = walletTransactionService.create(WalletTransactionDTOcreate.builder()
-                            .customerId(object.getCustomerId())
-                            .amount(-totalPrice).description("Thanh toan don hang " +order.getId())
-                            .createDate(new Date(System.currentTimeMillis()))
-                            .build());
-                    if(rs.getCode() != 200){
-                        throw new Exception("Wallet transaction " +rs.getMessage());
-                    }
-                }
+            //nếu là wallet thì check balance để trừ tiền
+            if(object.getMethod().equals(Method.WALLET.toString())){
+                checkBalanceToMinus(order, userSystem, object);
             }
 
             //create order detail
             for (OrderDetailDTOcreate orderDetailDTOcreate : object.getOrderDetails()) {
-                OrderDetail orderDetail = modelMapper.map(orderDetailDTOcreate, OrderDetail.class);
-                Food food = foodRepository.findById(orderDetailDTOcreate.getFoodId()).orElse(null);
-                if(food == null){
-                    throw new Exception("food not found");
-                }
-                //check stock của food trogn kho xem còn đủ không
-                if(food.getStock() < orderDetail.getAmount()){
-                    throw new Exception("stock not enough");
-                }
-                orderDetail.setId(new OrderDetailKey(food.getId(), order.getId()));
-                orderDetail.setFood(food);
-                orderDetail.setOrder(order);
-                orderDetailRepository.save(orderDetail);
-
-                //cập nhật lại stock cho food
-                food.setStock(food.getStock() - orderDetail.getAmount());
-                foodRepository.save(food);
-
+                OrderDetail orderDetail = createOrderDetail(order, orderDetailDTOcreate);
                 //cập nhật total price cho order
                 order.setTotalPrice(order.getTotalPrice() + (orderDetail.getAmount() * orderDetail.getPrice()));
             }
 
             //create payment order
-            PaymentOrder paymentOrder = new PaymentOrder();
-            paymentOrder.setOrder(order);
-            paymentOrder.setMethod(object.getMethod());
-            if(object.getPhoneGuest() != null){
-                paymentOrder.setNameGuest(object.getNameGuest());
-                paymentOrder.setPhoneGuest(object.getPhoneGuest());
-                paymentOrder.setAddress(object.getAddress());
-            }
-            paymentOrderRepository.save(paymentOrder);
+            createPaymentOrder(order, object);
 
             return ResponseObject.builder()
                     .code(200)
@@ -228,6 +173,138 @@ public class OrdersServiceImpl implements OrdersService {
         }catch (Exception e){
             throw new Exception("Exception: " + e.getMessage());
         }
+    }
+
+    @Override
+    public ResponseObject<Object> orderThirdParty(HttpServletRequest req, OrderDTOcreate object) throws Exception {
+        try{
+            //check user
+            UserSystem userSystem = validateUserInOrder(object);
+
+            //create order trc
+            Order order = createOrder(userSystem, object);
+            order = ordersRepository.save(order);
+
+            //create order detail
+            for (OrderDetailDTOcreate orderDetailDTOcreate : object.getOrderDetails()) {
+                OrderDetail orderDetail = createOrderDetail(order, orderDetailDTOcreate);
+                //cập nhật total price cho order
+                order.setTotalPrice(order.getTotalPrice() + (orderDetail.getAmount() * orderDetail.getPrice()));
+            }
+
+            //create payment order
+            createPaymentOrder(order, object);
+
+            //gọi vn pay và nhận rs trả về để đổi status order
+            ResponseObject urlRs = paymentService.createPayment(req, Math.round(order.getTotalPrice()), userSystem.getId(), userSystemService, true, order.getId());
+            if(urlRs.getCode() != 200){
+                throw new Exception(urlRs.getMessage());
+            }
+
+//            //chuyển hướng đến url payment của vn pay
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.add(HttpHeaders.LOCATION, (String) urlRs.getData());
+//            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+
+            return ResponseObject.builder()
+                    .code(200)
+                    .message("Success")
+                    .data((String) urlRs.getData())
+                    .build();
+        }catch (Exception e){
+            throw new Exception("Exception: " + e.getMessage());
+        }
+    }
+
+    private UserSystem validateUserInOrder(OrderDTOcreate object) throws Exception{
+        UserSystem userSystem = null;
+        if(object.getPhoneGuest() != null){
+            //guest order COD
+            userSystem = userSystemRepository.findByEmail(EmailDefault.CUSTOMER_EMAIL_DEFAULT);
+        }else{
+            //user order
+            userSystem =  userSystemRepository.findById(object.getCustomerId()).orElse(null);
+        }
+        if(userSystem == null){
+            throw new Exception("user not found");
+        }
+        return userSystem;
+    }
+
+    private void createPaymentOrder(Order order, OrderDTOcreate object) throws Exception{
+        PaymentOrder paymentOrder = new PaymentOrder();
+        paymentOrder.setOrder(order);
+        paymentOrder.setMethod(object.getMethod());
+        if(object.getPhoneGuest() != null){
+            paymentOrder.setNameGuest(object.getNameGuest());
+            paymentOrder.setPhoneGuest(object.getPhoneGuest());
+            paymentOrder.setAddress(object.getAddress());
+        }
+        paymentOrderRepository.save(paymentOrder);
+    }
+
+    private OrderDetail createOrderDetail(Order order, OrderDetailDTOcreate orderDetailDTOcreate) throws Exception{
+        OrderDetail orderDetail = modelMapper.map(orderDetailDTOcreate, OrderDetail.class);
+        Food food = foodRepository.findById(orderDetailDTOcreate.getFoodId()).orElse(null);
+        if(food == null){
+            throw new Exception("food not found");
+        }
+        //check stock của food trogn kho xem còn đủ không
+        if(food.getStock() < orderDetail.getAmount()){
+            throw new Exception("stock not enough");
+        }
+        orderDetail.setId(new OrderDetailKey(food.getId(), order.getId()));
+        orderDetail.setFood(food);
+        orderDetail.setOrder(order);
+        orderDetailRepository.save(orderDetail);
+
+        //cập nhật lại stock cho food
+        food.setStock(food.getStock() - orderDetail.getAmount());
+        foodRepository.save(food);
+
+        return orderDetail;
+    }
+
+    private void checkBalanceToMinus(Order order, UserSystem userSystem, OrderDTOcreate object) throws Exception {
+        int totalPrice = 0;
+        //tính totalprice trước để check tiền trừ
+        for (OrderDetailDTOcreate orderDetailDTOcreate : object.getOrderDetails()) {
+            totalPrice += orderDetailDTOcreate.getPrice() * orderDetailDTOcreate.getAmount();
+        }
+        if(userSystem.getWallet().getBalance() < totalPrice){
+            throw new Exception("balance not enough");
+        }else{
+            //thanh toán tiền
+            userSystem.getWallet().setBalance(userSystem.getWallet().getBalance() - totalPrice);
+            userSystemRepository.save(userSystem);
+
+            //create wallet transaction luôn
+            ResponseObject rs = walletTransactionService.create(WalletTransactionDTOcreate.builder()
+                    .customerId(object.getCustomerId())
+                    .amount(-totalPrice).description("Thanh toan don hang " +order.getId())
+                    .createDate(new Date(System.currentTimeMillis()))
+                    .build());
+            if(rs.getCode() != 200){
+                throw new Exception("Wallet transaction " +rs.getMessage());
+            }
+        }
+    }
+
+    private Order createOrder(UserSystem userSystem, OrderDTOcreate object) throws Exception {
+        Order order = new Order();
+        order.setCreateDate(new Date(System.currentTimeMillis()));
+        order.setCustomer(userSystem);
+        order.setEmployee(userSystemRepository.findByEmail(EmailDefault.EMPLOYEE_EMAIL_DEFAULT));
+        order.setShipper(userSystemRepository.findByEmail(EmailDefault.SHIPPER_EMAIL_DEFAULT));
+        if(     object.getMethod().equals(Method.COD.toString()) ||
+                object.getMethod().equals(Method.THIRDPARTY.toString())){   //vì COD, THIRDPARTY mới cần check duyệt, còn cái kia là thanh toán đơn luôn rồi
+            order.setStatus(StatusOrder.PENDING.toString());
+        }else{
+            order.setStatus(StatusOrder.ACCEPT.toString());
+        }
+        order.setUpdateDate(null);
+        order.setDeliveryTime(null);
+        return order;
     }
 
     @Override

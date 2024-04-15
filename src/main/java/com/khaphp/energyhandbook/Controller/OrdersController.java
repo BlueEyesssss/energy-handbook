@@ -10,6 +10,7 @@ import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Service.NewsService;
 import com.khaphp.energyhandbook.Service.OrdersService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -48,6 +49,22 @@ public class OrdersController {
     public ResponseEntity<?> createObject(@RequestBody @Valid OrderDTOcreate object) throws Exception {
         try{
             ResponseObject responseObject = ordersService.create(object);
+            if(responseObject.getCode() == 200){
+                return ResponseEntity.ok(responseObject);
+            }
+            return ResponseEntity.badRequest().body(responseObject);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(ResponseObject.builder()
+                    .code(400).message(e.getMessage())
+                    .build());
+        }
+    }
+
+    @PostMapping("/third-party")
+    @Operation(summary = "THIRD PARTY (guest, cus)")
+    public ResponseEntity<?> createObject3Party(HttpServletRequest request, @RequestBody @Valid OrderDTOcreate object) throws Exception {
+        try{
+            ResponseObject responseObject = ordersService.orderThirdParty(request, object);
             if(responseObject.getCode() == 200){
                 return ResponseEntity.ok(responseObject);
             }

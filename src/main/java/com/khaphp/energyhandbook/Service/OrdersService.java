@@ -5,6 +5,8 @@ import com.khaphp.energyhandbook.Dto.News.NewsDTOupdate;
 import com.khaphp.energyhandbook.Dto.Order.OrderDTOcreate;
 import com.khaphp.energyhandbook.Dto.Order.OrderDTOupdate;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface OrdersService {
@@ -12,6 +14,7 @@ public interface OrdersService {
     ResponseObject<Object> getAll(int pageSize, int pageIndex);
     ResponseObject<Object> getDetail(String id);
     ResponseObject<Object> create(OrderDTOcreate object) throws Exception;
+    ResponseObject<Object> orderThirdParty(HttpServletRequest req, OrderDTOcreate object) throws Exception;
     ResponseObject<Object> updateStatus(OrderDTOupdate object);
     ResponseObject<Object> updateShipperTakeOrder(String orderId, String shipperId);
     ResponseObject<Object> finishDeilivery(String orderId, String shipperId);

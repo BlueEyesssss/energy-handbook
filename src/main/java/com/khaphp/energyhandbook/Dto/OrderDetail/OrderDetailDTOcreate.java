@@ -1,4 +1,4 @@
-package com.khaphp.energyhandbook;
+package com.khaphp.energyhandbook.Dto.OrderDetail;
 
 import lombok.*;
 

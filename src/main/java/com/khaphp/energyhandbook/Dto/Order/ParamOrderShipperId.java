@@ -1,10 +1,6 @@
 package com.khaphp.energyhandbook.Dto.Order;
 
-import com.khaphp.energyhandbook.OrderDetailDTOcreate;
-import com.khaphp.energyhandbook.Util.ValidData.MethodOrder.ValidMethod;
 import lombok.*;
-
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
