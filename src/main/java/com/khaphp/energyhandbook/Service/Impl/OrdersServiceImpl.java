@@ -320,6 +320,13 @@ public class OrdersServiceImpl implements OrdersService {
             }
             object1.setStatus(object.getStatus());
             object1.setUpdateDate(new Date(System.currentTimeMillis()));
+            if(     object.getStatus().equals(StatusOrder.REJECT.toString()) ||
+                    object.getStatus().equals(StatusOrder.CANCEL.toString())){
+                //trả lại stock cho food
+                for (OrderDetail orderDetail: object1.getOrderDetails()){
+                    orderDetail.getFood().setStock(orderDetail.getFood().getStock() + orderDetail.getAmount());
+                }
+            }
             ordersRepository.save(object1);
             return ResponseObject.builder()
                     .code(200)
@@ -419,8 +426,10 @@ public class OrdersServiceImpl implements OrdersService {
                 if (!object1.getCustomer().getId().equals(userSystem.getId())) {    //check xem order phải của cus này ko
                     throw new Exception("user is not own this order");
                 }
-                if(!object1.getStatus().equals(StatusOrder.ACCEPT.toString())){     //nếu order đã ACCPET thì ko CANCEL đc
-                    throw new Exception("order accept can not cancel");
+                if(     object1.getStatus().equals(StatusOrder.ACCEPT.toString()) ||
+                        object1.getStatus().equals(StatusOrder.WAITING.toString()) ||
+                        object1.getStatus().equals(StatusOrder.FINISH.toString())){     //nếu order đã ACCPET thì ko CANCEL đc
+                    throw new Exception("order can not cancel");
                 }
             }else if(role.equals(Role.SHIPPER.toString())){
                 if (!object1.getShipper().getId().equals(userSystem.getId())) {    //check xem order phải của shipper này ko
@@ -430,6 +439,11 @@ public class OrdersServiceImpl implements OrdersService {
             //còn employee thì đứa nào cancel cũng đc
             object1.setStatus(StatusOrder.CANCEL.toString());
             object1.setUpdateDate(new Date(System.currentTimeMillis()));
+            //trả lại stock cho food
+            for (OrderDetail orderDetail: object1.getOrderDetails()){
+                orderDetail.getFood().setStock(orderDetail.getFood().getStock() + orderDetail.getAmount());
+            }
+
             ordersRepository.save(object1);
             return ResponseObject.builder()
                     .code(200)
