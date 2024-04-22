@@ -5,6 +5,7 @@ import com.khaphp.energyhandbook.Constant.Method;
 import com.khaphp.energyhandbook.Constant.Role;
 import com.khaphp.energyhandbook.Constant.StatusOrder;
 import com.khaphp.energyhandbook.Dto.Food.FoodDTOviewInOrtherEntity;
+import com.khaphp.energyhandbook.Dto.Notification.NotificationDTOcreate;
 import com.khaphp.energyhandbook.Dto.Order.OrderDTOcreate;
 import com.khaphp.energyhandbook.Dto.Order.OrderDTOupdate;
 import com.khaphp.energyhandbook.Dto.Order.OrderDTOviewDetail;
@@ -16,10 +17,7 @@ import com.khaphp.energyhandbook.Entity.*;
 import com.khaphp.energyhandbook.Entity.keys.OrderDetailKey;
 import com.khaphp.energyhandbook.Dto.OrderDetail.OrderDetailDTOcreate;
 import com.khaphp.energyhandbook.Repository.*;
-import com.khaphp.energyhandbook.Service.OrdersService;
-import com.khaphp.energyhandbook.Service.PaymentService;
-import com.khaphp.energyhandbook.Service.UserSystemService;
-import com.khaphp.energyhandbook.Service.WalletTransactionService;
+import com.khaphp.energyhandbook.Service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +69,9 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Value("${aws.s3.link_bucket}")
     private String linkBucket;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public ResponseObject<Object> getAll(int pageSize, int pageIndex) {
@@ -358,6 +359,15 @@ public class OrdersServiceImpl implements OrdersService {
             object1.setUpdateDate(new Date(System.currentTimeMillis()));
             object1.setShipper(shipper);
             ordersRepository.save(object1);
+
+            //noti đến ch order để báo cho họ bik
+            ResponseObject rs = notificationService.create(NotificationDTOcreate.builder()
+                    .userId(object1.getCustomer().getId())
+                    .title(shipper.getName() +" đã tiếp nhận đơn hàng " + orderId + " của bạn")
+                    .build());
+            if(rs.getCode() != 200){
+                throw new Exception(rs.getMessage());
+            }
             return ResponseObject.builder()
                     .code(200)
                     .message("Success")

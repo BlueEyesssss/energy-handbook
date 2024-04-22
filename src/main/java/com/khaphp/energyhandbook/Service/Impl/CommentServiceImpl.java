@@ -1,10 +1,12 @@
 package com.khaphp.energyhandbook.Service.Impl;
 
+import com.khaphp.energyhandbook.Constant.TypeInteract;
 import com.khaphp.energyhandbook.Dto.Comment.CommentChild;
 import com.khaphp.energyhandbook.Dto.Comment.CommentDTOcreate;
 import com.khaphp.energyhandbook.Dto.Comment.CommentDTOviewAll;
 import com.khaphp.energyhandbook.Dto.Comment.CommentDTOviewDetail;
 import com.khaphp.energyhandbook.Dto.CookingRecipe.CookingRecipeDTOviewInOrtherEntity;
+import com.khaphp.energyhandbook.Dto.Notification.NotificationDTOcreate;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Dto.Usersystem.UserSystemDTOviewInOrtherEntity;
 import com.khaphp.energyhandbook.Entity.Comment;
@@ -13,6 +15,7 @@ import com.khaphp.energyhandbook.Entity.UserSystem;
 import com.khaphp.energyhandbook.Repository.CommentRepository;
 import com.khaphp.energyhandbook.Repository.CookingRecipeRepository;
 import com.khaphp.energyhandbook.Service.CommentService;
+import com.khaphp.energyhandbook.Service.NotificationService;
 import com.khaphp.energyhandbook.Service.UserSystemService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +44,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Value("${aws.s3.link_bucket}")
     private String linkBucket;
+
+    @Autowired
+    private NotificationService notificationService;
     @Override
     public ResponseObject<Object> getAll(int pageSize, int pageIndex, String cookingRecipeId) {
         Page<Comment> objListPage = null;
@@ -166,6 +172,17 @@ public class CommentServiceImpl implements CommentService {
                 comment.setParentCommentId("");
             }
             commentRepository.save(comment);
+
+            //noti if customer comment answer owner of cooking recipe
+            if(cookingRecipe.getCustomer().getId().equals(replyTo.getId())){
+                ResponseObject rs = notificationService.create(NotificationDTOcreate.builder()
+                        .userId(cookingRecipe.getCustomer().getId())
+                        .title(owner.getName() +" đã bình luận vào công thức " + cookingRecipe.getName())
+                        .build());
+                if(rs.getCode() != 200){
+                    throw new Exception(rs.getMessage());
+                }
+            }
             return ResponseObject.builder()
                     .code(200)
                     .message("Success")

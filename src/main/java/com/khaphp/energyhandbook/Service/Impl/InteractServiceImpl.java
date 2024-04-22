@@ -3,6 +3,7 @@ package com.khaphp.energyhandbook.Service.Impl;
 import com.khaphp.energyhandbook.Constant.TypeInteract;
 import com.khaphp.energyhandbook.Dto.Interact.InteractDTOcreate;
 import com.khaphp.energyhandbook.Dto.Interact.InteractDTOdelete;
+import com.khaphp.energyhandbook.Dto.Notification.NotificationDTOcreate;
 import com.khaphp.energyhandbook.Dto.ResponseObject;
 import com.khaphp.energyhandbook.Entity.CookingRecipe;
 import com.khaphp.energyhandbook.Entity.News;
@@ -14,10 +15,12 @@ import com.khaphp.energyhandbook.Repository.UserSystemRepository;
 import com.khaphp.energyhandbook.Repository.VotesRepository;
 import com.khaphp.energyhandbook.Service.CookingRecipeService;
 import com.khaphp.energyhandbook.Service.InteractService;
+import com.khaphp.energyhandbook.Service.NotificationService;
 import com.khaphp.energyhandbook.Service.UserSystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -37,7 +40,11 @@ public class InteractServiceImpl implements InteractService {
 
     @Value("${aws.s3.link_bucket}")
     private String linkBucket;
+
+    @Autowired
+    private NotificationService notificationService;
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ResponseObject<Object> create(InteractDTOcreate object) {
         try{
             UserSystem userSystem = (UserSystem) userSystemService.getDetail(object.getCustomerId()).getData();
@@ -81,6 +88,28 @@ public class InteractServiceImpl implements InteractService {
                 cookingRecipe.getUserReports().add(userSystem);
             }
             cookingRecipeRepository.save(cookingRecipe);
+
+            //tạo notification cho owner cooking recipe
+            if(object.getTypeInteract().equals(TypeInteract.LIKE.toString())){
+                ResponseObject rs = notificationService.create(NotificationDTOcreate.builder()
+                                .userId(cookingRecipe.getCustomer().getId())
+                                .title(userSystem.getName() +" đã thích công thức " + cookingRecipe.getName())
+                        .build());
+                if(rs.getCode() != 200){
+                    throw new Exception(rs.getMessage());
+                }
+            } else if(object.getTypeInteract().equals(TypeInteract.SHARE.toString())){ //noti cho người đc share công thức này
+                for(String gmail : object.getGmails()){
+                    UserSystem user = userSystemRepository.findByEmail(gmail);
+                    ResponseObject rs = notificationService.create(NotificationDTOcreate.builder()
+                            .userId(user.getId())
+                            .title(cookingRecipe.getCustomer().getName() +" đã chia sẻ công thức "+cookingRecipe.getName() + " với bạn")
+                            .build());
+                    if(rs.getCode() != 200){
+                        throw new Exception(rs.getMessage());
+                    }
+                }
+            }
             return ResponseObject.builder()
                     .code(200)
                     .message("Success " + object.getTypeInteract())
